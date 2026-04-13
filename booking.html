@@ -1,11 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Cab System</title>
+
 </head>
+
 <body>
-    <form></form>
+    <form id="bookingForm">
+        <p><label>Name:</label>
+            <input type="text" name="name"required></input>
+        </p>
+        <p><label>Phone number:</label>
+            <input type="tel" placeholder="123 456 7890" name="phone"required></input>
+        </p>
+        <p><label>Unit Number: </label>
+            <input type="text" name="unit"></input>
+        </p>
+        <p><label> Street Name: </label>
+            <input type="text" name="sname" required></input>
+        </p>
+        <p><label> Street Number: </label>
+            <input type="text" name="snumber" required></input>
+        </p>
+        <p><label> Suburb: </label>
+            <input type="text" name="suburb"></input>
+        </p>
+        <p><label> Destination Suburb: </label>
+            <input type="text" name ="destsuburb"></input>
+        </p>
+        <p><label> Pick Up Date: </label>
+            <input type="date" name="date"></input>
+        </p>
+        <p><label>Pick up time: </label>
+            <input type="time" name="time_picker" name="time"></input>
+        </p>
+        <input type="submit" id="book"></input>
+    </form>
+
+    <script src="booking.js"></script>
+
 </body>
+
 </html>
