@@ -11,25 +11,25 @@
 <body>
     <form id="bookingForm">
         <p><label>Name:</label>
-            <input type="text" name="name"required></input>
+            <input type="text" name="cname" required></input>
         </p>
         <p><label>Phone number:</label>
-            <input type="tel" placeholder="123 456 7890" name="phone"required></input>
+            <input type="tel" placeholder="123 456 7890" name="phone" required></input>
         </p>
         <p><label>Unit Number: </label>
-            <input type="text" name="unit"></input>
-        </p>
-        <p><label> Street Name: </label>
-            <input type="text" name="sname" required></input>
+            <input type="text" name="unumber"></input>
         </p>
         <p><label> Street Number: </label>
             <input type="text" name="snumber" required></input>
         </p>
+        <p><label> Street Name: </label>
+            <input type="text" name="stname" required></input>
+        </p>
         <p><label> Suburb: </label>
-            <input type="text" name="suburb"></input>
+            <input type="text" name="sbname"></input>
         </p>
         <p><label> Destination Suburb: </label>
-            <input type="text" name ="destsuburb"></input>
+            <input type="text" name="”dsbname”"></input>
         </p>
         <p><label> Pick Up Date: </label>
             <input type="date" name="date"></input>
@@ -40,6 +40,9 @@
         <input type="submit" id="book"></input>
     </form>
 
+    <div id="reference">
+        <!-- server response to go in a table in this div -->
+    </div>
     <script src="booking.js"></script>
 
 </body>
