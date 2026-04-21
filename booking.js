@@ -6,7 +6,7 @@
 
 //get form
 const form = document.getElementById("bookingForm");
-
+const httpAction = "POST";
 //Step 1 , receive input
 
 form.addEventListener('submit', (e) => { // 
@@ -20,30 +20,31 @@ form.addEventListener('submit', (e) => { //
 
     }
     if (validateData(formData)) {
-        sendBooking(formData, "POST"); // hardcoded action
+        sendBooking(formData, httpAction); // json form data + POST
     }
-    alert("booking data failed validation");
+    else {
+        alert("booking data failed validation");
+    }
 });
 //step 2, validate input
 function validateData(formData) {
+    const pattern = "^\d{10,12}+\s$"
     if (!formData) {
         return false;
     }
     //more validation needed 
     //e.g. 
     const phone = formData.get("phone");
-    if (!/^[0-9\s]+$/.test(phone)) {
-        alert("Phone number must be numeric"); //html popout alert box
+    if(!pattern.test(phone)) {
+          alert("Phone number must be numeric and 10-12 digits"); //html popout alert box
         return false;
-    }
+    }      
     return true;
 }
 
 
-
-
 function sendBooking(formData, action) {
-    var url = "test.php?action=" + action;
+    var url = "booking.php?action=" + action;
     // step 3
     // send to backend
     fetch(url, {
@@ -51,17 +52,19 @@ function sendBooking(formData, action) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData) // convert JS object to a string
-    
+        body: formData // send form data object, server side stored in _POST array with the form names as the variable names
+
     })
         .then(res => {
-            if(!res.ok){
+            if (!res.ok) {
                 //error
             }
             return res.json(); // parse response back to javascript object
         })
-        .then(data => console.log("Server response", data))
-        .catch(err => console.err("Error"))
+        .then(data => {
+            document.getElementById("reference").innerText = data.message; // contents of message key in response to be inserted in the reference <p> element in html page
+        })
+        .catch(err => console.error("Error"))
 
 }
 
