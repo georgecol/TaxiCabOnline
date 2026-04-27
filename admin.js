@@ -1,38 +1,17 @@
 // load bookings within 2 hours of the time on page load
 document.addEventListener("DOMContentLoaded", function () {
+    loadDefaultBookings();
     console.log("DOM is ready!");
 
 });
-function queryBookings(){
-    
-}
-
-
-function loadDefaultBookings() {
+function queryBookings() {
+    const ref = document.getElementById("bsearch").value.trim() // remove whitespace from string e.g. "BRN0001  " -> "BRN0001";
+    // case 1
     if (ref === "") {
-        fetch("admin.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: "action=" + encodeURIComponent(ref)
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    console.log(data);
-                    renderTable(data.data);
-                }
-                else {
-                    document.getElementById("message").innerHTML = "Error: " + data.error;
-                }
-            })
+        loadDefaultBookings();
+        return;
     }
-}
-
-
-
-function searchBookings() {
-    const ref = document.getElementById("bsearch").value;
-    // validation
+    //case 2
     // if query emtpy then load bookings within 2 hours
     const pattern = /^BRN[0-9]{5}$/;
     if (!pattern.test(ref)) {
@@ -40,24 +19,53 @@ function searchBookings() {
         return false;
     }
     else {
-        // case 2, ref not empty, load booking value
+        searchBookings(ref);
+    }
+}
+
+
+function loadDefaultBookings() {
+    //case 1, search bar empty
         fetch("admin.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: "action=search&bsearch=" + encodeURIComponent(ref)
+            body: "action=search&bsearch=" // send action search with empty value 
         })
-            .then(res => res.json())
+            .then(res => res.json()) // parse to json object 
             .then(data => {
-                if (data.success) {
+                if (data.success) { // if success message from database = true
                     console.log(data);
-                    renderTable(data.data);
-                } else {
-                    document.getElementById("message").innerHTML = "Error: " + data.error;
+                    renderTable(data.data); 
+                    document.getElementById("message").innerHTML = data.message; // display message from server 
                 }
-            });
-    }
-
+                else { // success = false
+                    document.getElementById("message").innerHTML = "Error: " + data.error; 
+                }
+            })
 }
+
+
+
+function searchBookings(ref) {
+    // case 2, ref not empty, load booking value
+    fetch("admin.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=search&bsearch=" + encodeURIComponent(ref)
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                console.log(data);
+                renderTable(data.data);
+                document.getElementById("message").innerHTML = data.message; // display message from server 
+            } else {
+                document.getElementById("message").innerHTML = "Error: " + data.error;
+            }
+        });
+}
+
+
 
 function renderTable(data) {
     if (!data || data.length === 0) {
@@ -82,7 +90,7 @@ function renderTable(data) {
         html += `
         <tr>
             <td>${row.booking_id}</td>       
-            <td>${row.customer_name}</td>
+            <td>${row.cname}</td>
             <td>${row.phone}</td>            
             <td>${row.sbname}</td>
             <td>${row.dsbname}</td>
@@ -110,6 +118,6 @@ function assignBooking(id) {
         .then(res => res.json())
         .then(data => {
             document.getElementById("message").innerHTML = data.message;
-            searchBookings();
+            queryBookings();
         });
 }
