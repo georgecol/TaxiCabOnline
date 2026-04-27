@@ -33,3 +33,8 @@ CREATE TABLE bookings (
 );
 
 
+ALTER TABLE bookings RENAME COLUMN booking_datetime TO booking_date;
+ALTER TABLE bookings ADD booking_time TIME;
+
+
+
