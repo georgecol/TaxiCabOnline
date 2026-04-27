@@ -1,7 +1,7 @@
-<?php
-// turn on error output
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+<?php 
+// turn on error output for when want to debug full error in front end res.text()
+// ini_set('display_errors', 1);
+// error_reporting(E_ALL);
 // server side code to get input from client  session, then log it in the database
 session_start();
 // $_SESSION["bookingID"] // sesion variable, maybe later add the functionality of updating the session on each form element change, so its not lost when you refresh
@@ -57,7 +57,8 @@ $booking_ref = "BRN" . str_pad($num, 5, "0", STR_PAD_LEFT); // pad five 0's on t
 // insert
 $stmt = $connection->prepare("
 INSERT INTO bookings 
-(booking_ref, cname, phone, unumber, snumber, stname, sbname, dsbname, pickup_date, pickup_time, booking_date, booking_time, status)
+(booking_ref, cname, phone, unumber, snumber, stname, sbname, dsbname, 
+pickup_date, pickup_time, booking_date, booking_time, status)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
 ");
 // default status if driver not assigned
