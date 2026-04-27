@@ -19,12 +19,11 @@ form.addEventListener('submit', (e) => { //
         console.log(`${key}: ${value}`);
 
     }
-    if (validateData(formData)) {
+    let test = validateData(formData)
+    if (test) {
         sendBooking(formData, httpAction); // json form data + POST
     }
-    else {
-        alert("booking data failed validation");
-    }
+    // test fail, end of submit flow
 });
 //step 2, validate input
 function validateData(formData) {

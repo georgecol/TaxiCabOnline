@@ -1,19 +1,62 @@
+// load bookings within 2 hours of the time on page load
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM is ready!");
+
+});
+function queryBookings(){
+    
+}
+
+
+function loadDefaultBookings() {
+    if (ref === "") {
+        fetch("admin.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "action=" + encodeURIComponent(ref)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(data);
+                    renderTable(data.data);
+                }
+                else {
+                    document.getElementById("message").innerHTML = "Error: " + data.error;
+                }
+            })
+    }
+}
+
+
+
 function searchBookings() {
     const ref = document.getElementById("bsearch").value;
-    fetch("admin.php", {
-        method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: "action=search&bsearch=" + encodeURIComponent(ref)
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            console.log(data);
-            renderTable(data.data); 
-        } else {
-            document.getElementById("message").innerHTML = "Error: " + data.error;
-        }
-    });
+    // validation
+    // if query emtpy then load bookings within 2 hours
+    const pattern = /^BRN[0-9]{5}$/;
+    if (!pattern.test(ref)) {
+        alert("Error, input correct booking reference");
+        return false;
+    }
+    else {
+        // case 2, ref not empty, load booking value
+        fetch("admin.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "action=search&bsearch=" + encodeURIComponent(ref)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(data);
+                    renderTable(data.data);
+                } else {
+                    document.getElementById("message").innerHTML = "Error: " + data.error;
+                }
+            });
+    }
+
 }
 
 function renderTable(data) {
@@ -41,8 +84,8 @@ function renderTable(data) {
             <td>${row.booking_id}</td>       
             <td>${row.customer_name}</td>
             <td>${row.phone}</td>            
-            <td>${row.pickup_suburb}</td>
-            <td>${row.destination_suburb}</td>
+            <td>${row.sbname}</td>
+            <td>${row.dsbname}</td>
             <td>${row.pickup_time}</td>
             <td>${row.status}</td>
             <td>
@@ -61,12 +104,12 @@ function renderTable(data) {
 function assignBooking(id) {
     fetch("admin.php", {
         method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "action=assign&id=" + encodeURIComponent(id)
     })
-    .then(res => res.json())           
-    .then(data => {
-        document.getElementById("message").innerHTML = data.message;
-        searchBookings();
-    });
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("message").innerHTML = data.message;
+            searchBookings();
+        });
 }

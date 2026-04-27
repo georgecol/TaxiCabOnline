@@ -32,10 +32,10 @@ if ($action === "search") {
     if (!empty($input)) {
 
         // if (!preg_match("/^BRN[0-9]{5}$/", $input)) {
-        //     echo json_encode([
-        //         "success" => true,
-        //         "data" => []
-        //     ]);
+            echo json_encode([
+                "success" => true,
+                "data" => []
+            ]);
         //     exit;
         // }
 
