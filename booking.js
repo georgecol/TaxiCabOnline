@@ -60,20 +60,19 @@ function sendBooking(formData, action) {
 
     })
         .then(res => {
-            if (!res.ok) {
-                //error
-            }
-            return res.json(); // parse response back to javascript object
-            // return res.text() // raw text for debugging
+            return res.json(); // extract response
+            // return res.text() // raw text for debugging if server sent error to us
         })
         .then(res => {
-            // document.getElementById("reference").innerText = res.message; // contents of message key in response to be inserted in the reference <p> element in html page
-            console.log("Raw response:", text);
+            // console.log("Raw response:", text);
+            // console.log("Second stage after res.json()");
+            // console.log(res);
             try {
-                const data = JSON.parse(text);
-                document.getElementById("reference").innerText = data.message;
+                // const data = JSON.parse(res.message); // attempt to convert the booking confirmation message from string to json object
+                
+                document.getElementById("reference").innerText = res.message; // display string directly to screen, put in the reference div
             } catch (e) {
-                console.error("Invalid JSON from server");
+                console.error("Error parsing response");
             }
 
         })
