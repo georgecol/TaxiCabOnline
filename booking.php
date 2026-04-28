@@ -19,8 +19,9 @@ $a = require_once("../../files/sqlinfoassignment.inc.php"); // absolute path to 
 
 $connection = mysqli_connect($sql_host,$sql_user,$sql_pass,$sql_db); // create connection 
 
-if (!$connection) {
+if (!$connection) { // if no, most likely problem with credentials or path to cre
     die("DB connection failed: " . mysqli_connect_error());
+    // die is similar to exit(), just prints error to stdout and terminates programm with exit code 0
 }
 
 
@@ -100,15 +101,15 @@ if(!$stmt->execute()){
 // send response with booking confirmation
 
 //format output
-// $formattedDate = date("d/m/Y", strtotime($date));
+$formattedDate = date("d/m/Y", strtotime($date));
 $formattedTime = date("H:i", strtotime($time));
 // Return JSON response
 $response = [
-    "sucess" => true,
+    "success" => true,
     "message" => "Thank you for your booking $cname!\n" .
                  "Booking reference number: $booking_ref\n" .
-                 "Pickup time: $formattedTime\n" 
-                //  "Pickup date: $formattedDate"
+                 "Pickup time: $formattedTime\n" . 
+                 "Pickup date: $formattedDate"
 ];
 
 header('Content-Type: application/json');

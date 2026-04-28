@@ -11,14 +11,15 @@ const httpAction = "POST";
 
 form.addEventListener('submit', (e) => { // 
     e.preventDefault(); // prevents submission of a blank form, case sensitive event.preventDefault() not event.PreventDefault()
-    console.log("submit triggered"); // testing if this fires.
-    //get form data
-    const formData = new FormData(e.target); // consolidate form data 
-
-    for (let [key, value] of formData.entries()) {
+    console.log("submit triggered"); // testing 
+    //get form data object
+    formData = new FormData(e.target);
+    //debug
+    for (let [key, value] of formData.entries()) { // debug print
         console.log(`${key}: ${value}`);
 
     }
+    //validate
     let test = validateData(formData)
     if (test) {
         sendBooking(formData, httpAction); // json form data + POST
@@ -46,6 +47,7 @@ function validateData(formData) {
         alert("Pickup time cannot be in the past");
         return false;
     }
+
     return true;
 }
 
@@ -69,7 +71,7 @@ function sendBooking(formData, action) {
             // console.log(res);
             try {
                 // const data = JSON.parse(res.message); // attempt to convert the booking confirmation message from string to json object
-                
+
                 document.getElementById("reference").innerText = res.message; // display string directly to screen, put in the reference div
             } catch (e) {
                 console.error("Error parsing response");
