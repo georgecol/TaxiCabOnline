@@ -11,16 +11,17 @@ const httpAction = "POST";
 
 form.addEventListener('submit', (e) => { // 
     e.preventDefault(); // prevents submission of a blank form, case sensitive event.preventDefault() not event.PreventDefault()
-    console.log("submit triggered"); // testing if this fires.
-    //get form data
-    const formData = new FormData(e.target); // consolidate form data 
-
-    for (let [key, value] of formData.entries()) {
+    console.log("submit triggered"); // testing 
+    //get form data object
+    formData = new FormData(e.target);
+    //debug
+    for (let [key, value] of formData.entries()) { // debug print
         console.log(`${key}: ${value}`);
 
     }
-    
-    if (validateData(formData)) {
+    //validate
+    let test = validateData(formData)
+    if (test) {
         sendBooking(formData, httpAction); // json form data + POST
     }
     // test fail, end of submit flow
@@ -46,6 +47,7 @@ function validateData(formData) {
         alert("Pickup time cannot be in the past");
         return false;
     }
+
     return true;
 }
 
@@ -60,20 +62,19 @@ function sendBooking(formData, action) {
 
     })
         .then(res => {
-            if (!res.ok) {
-                //error
-            }
-            return res.json(); // parse response back to javascript object
-            // return res.text() // raw text for debugging
+            return res.json(); // extract response
+            // return res.text() // raw text for debugging if server sent error to us
         })
         .then(res => {
-            // document.getElementById("reference").innerText = res.message; // contents of message key in response to be inserted in the reference <p> element in html page
-            console.log("Raw response:", text);
+            // console.log("Raw response:", text);
+            // console.log("Second stage after res.json()");
+            // console.log(res);
             try {
-                const data = JSON.parse(text);
-                document.getElementById("reference").innerText = data.message;
+                // const data = JSON.parse(res.message); // attempt to convert the booking confirmation message from string to json object
+
+                document.getElementById("reference").innerText = res.message; // display string directly to screen, put in the reference div
             } catch (e) {
-                console.error("Invalid JSON from server");
+                console.error("Error parsing response");
             }
 
         })

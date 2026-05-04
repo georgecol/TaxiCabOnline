@@ -73,11 +73,11 @@ function renderTable(data) {
         document.querySelector(".content").innerHTML = "<p>No bookings found.</p>";
         return;
     }
-
+    
     let html = `
     <table border="1">
         <tr>
-            <th>Booking Reference Number</th>
+            <th>Booking Reference #</th>
             <th>Customer Name</th>
             <th>Phone</th>
             <th>Pickup Suburb</th>
@@ -88,6 +88,7 @@ function renderTable(data) {
         </tr>
     `;
     data.forEach(row => {
+        let datetime = row.pickup_date + " "+ row.pickup_time;
         html += `
         <tr>
             <td>${row.booking_id}</td>       
@@ -95,7 +96,7 @@ function renderTable(data) {
             <td>${row.phone}</td>            
             <td>${row.sbname}</td>
             <td>${row.dsbname}</td>
-            <td>${row.pickup_time}</td>
+            <td>${datetime}</td>
             <td>${row.status}</td>
             <td>
                 <button onclick="assignBooking('${row.booking_id}')"

@@ -19,8 +19,9 @@ $a = require_once("../../files/sqlinfoassignment.inc.php"); // absolute path to 
 
 $connection = mysqli_connect($sql_host,$sql_user,$sql_pass,$sql_db); // create connection 
 
-if (!$connection) {
+if (!$connection) { // if no, most likely problem with credentials or path to cre
     die("DB connection failed: " . mysqli_connect_error());
+    // die is similar to exit(), just prints error to stdout and terminates programm with exit code 0
 }
 
 
@@ -40,8 +41,12 @@ $query = "SELECT booking_ref FROM bookings ORDER BY booking_id DESC LIMIT 1";
 // send the query and store the result
 $result = mysqli_query($connection,$query);
 
+// result = 
+
+
 //each time mysqli_fetch_assoc called - it accesses data at the pointer and then increments it so the next time it accesses, its poiting to the next data, can return false if no row
 if ($row = mysqli_fetch_assoc($result)) { // fetch the row, turn it into an associative array with column name as key and column data as value
+
     $lastRef = $row['booking_ref']; // access the data at the key 'booking_ref', 
 } else {
     $lastRef = "BRN00000";
@@ -85,7 +90,14 @@ $stmt->bind_param(
     $status
 );
 
-$stmt->execute();  
+// check if statement executes
+// if not, send JSON message with sucess = false, message = error message
+if(!$stmt->execute()){
+    echo json_encode([
+        "sucess" => false,
+        "message" => "Statement error: ".$stmt->error
+    ]);
+}  
 // send response with booking confirmation
 
 //format output
@@ -93,14 +105,15 @@ $formattedDate = date("d/m/Y", strtotime($date));
 $formattedTime = date("H:i", strtotime($time));
 // Return JSON response
 $response = [
-    "message" => "Thank you for your booking!\n" .
+    "success" => true,
+    "message" => "Thank you for your booking $cname!\n" .
                  "Booking reference number: $booking_ref\n" .
-                 "Pickup time: $formattedTime\n" .
+                 "Pickup time: $formattedTime\n" . 
                  "Pickup date: $formattedDate"
 ];
 
 header('Content-Type: application/json');
-echo json_encode($response);
+echo json_encode($response); // send response back
 
 $connection->close();
 
