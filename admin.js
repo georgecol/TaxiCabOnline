@@ -13,7 +13,7 @@ function queryBookings() {
     }
     //case 2
     // if query emtpy then load bookings within 2 hours
-    const pattern = /^BRN[0-9]{5}$/;
+    const pattern = /^BRN[0-9]{5}$/; // regex pattern to match booking ref - BRN00001 - MUST be BRN then any 5 numbers
     if (!pattern.test(ref)) {
         alert("Error, input correct booking reference");
         return false;
@@ -26,6 +26,7 @@ function queryBookings() {
 
 function loadDefaultBookings() {
     //case 1, search bar empty
+    // http request to admin server
         fetch("admin.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
