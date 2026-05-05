@@ -62,10 +62,10 @@ function sendBooking(formData, action) {
 
     })
         .then(res => {
-            return res.json(); // extract response
+            return res.json(); // extract response, only works if server sending good json
             // return res.text() // raw text for debugging if server sent error to us
         })
-        .then(res => {
+        .then(res => { // change to text or res depending on mode
             // console.log("Raw response:", text);
             // console.log("Second stage after res.json()");
             // console.log(res);
@@ -78,7 +78,11 @@ function sendBooking(formData, action) {
             }
 
         })
-        .catch(err => console.error("Error"))
+        .catch(err => {
+            console.log("Caught error from server");
+            console.error("Error");
+            
+        })
 
 }
 
