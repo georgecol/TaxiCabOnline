@@ -10,7 +10,25 @@ following fields:
 - pick up DATETIME- both in one, validate server side that the pick up time is not earlier 
   than current time
 
+new 
 
+CREATE TABLE bookings (
+    booking_id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_ref VARCHAR(8) NOT NULL UNIQUE,
+    cname VARCHAR(100) NOT NULL,
+    phone VARCHAR(12) NOT NULL,
+    unumber VARCHAR(10),
+    snumber VARCHAR(10) NOT NULL,
+    stname VARCHAR(100) NOT NULL,
+    sbname VARCHAR(100),
+    dsbname VARCHAR(100),
+    pickup_date DATE NOT NULL,
+    pickup_time TIME NOT NULL,
+    booking_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('unassigned', 'assigned') NOT NULL DEFAULT 'unassigned'
+);
+
+old 
 
 CREATE TABLE bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -32,17 +50,4 @@ CREATE TABLE bookings (
     pickup_datetime DATETIME NOT NULL,
 );
 
-
-ALTER TABLE bookings RENAME COLUMN booking_datetime TO booking_date;
-ALTER TABLE bookings ADD booking_time TIME;
-
-
-
-// Store commands for later use (haven't run yet)
-
-DELETE * FROM bookings;
-
-or 
-
-DELETE FROM bookings WHERE booking_id = "1"
 

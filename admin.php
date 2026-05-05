@@ -2,15 +2,15 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-header('Content-Type: application/json');
+header('Content-Type: application/json'); // set response header to json
 
-session_start();
+session_start(); // CAN DELETE?
 
 // DB config
 require_once("../../files/sqlinfoassignment.inc.php");
-
+// establish connection from variables loaded from the line above (db config)
 $connection = mysqli_connect($sql_host, $sql_user, $sql_pass, $sql_db);
-
+// check connection
 if (!$connection) {
     echo json_encode([
         "success" => false,
@@ -19,7 +19,7 @@ if (!$connection) {
     exit;
 }
 
-// get action safely
+// get action safely (search,loadbookings,assign)
 $action = $_POST['action'] ?? '';
 
 
@@ -82,39 +82,38 @@ if ($action === "search") {
 
 // assign a booking
 if ($action === "assign") {
-
+    // get id from request 
     $id = $_POST['id'] ?? '';
-
+    // if no id, return false with error message
     if (empty($id)) {
         echo json_encode([
             "success" => false,
             "message" => "Missing booking ID"
         ]);
         exit;
-    }
-
+    } 
+    // if have id, prepare sql statement to edit booking
     $stmt = $connection->prepare("
         UPDATE bookings 
         SET status = 'assigned' 
         WHERE booking_id = ?
     ");
-
+    // insert the id into the statement
     $stmt->bind_param("s", $id);
-
-    if ($stmt->execute()) {
+    // execute statement , returns 1 if executes correctly,
+    if ($stmt->execute()) { // send confirmation message if true
         echo json_encode([
             "success" => true,
             "message" => "Booking $id successfully assigned"
         ]);
     } else {
-        echo json_encode([
+        echo json_encode([ // error message if false
             "success" => false,
             "message" => "Error assigning booking",
             "error" => $stmt->error
         ]);
     }
-
-    exit;
+    exit; // exit to not run the rest of the code
 }
 
 if($action === "loadDefault")
