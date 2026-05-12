@@ -27,22 +27,22 @@ function queryBookings() {
 function loadDefaultBookings() {
     //case 1, search bar empty
     // http request to admin server
-        fetch("admin.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: "action=search&bsearch=" // send action search with empty value 
+    fetch("admin.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=search&bsearch=" // send action search with empty value 
+    })
+        .then(res => res.json()) // parse to json object 
+        .then(data => {
+            if (data.success) { // if success message from database = true
+                console.log(data);
+                renderTable(data.data);
+                document.getElementById("message").innerHTML = data.message; // display message from server 
+            }
+            else { // success = false
+                document.getElementById("message").innerHTML = "Error: " + data.error;
+            }
         })
-            .then(res => res.json()) // parse to json object 
-            .then(data => {
-                if (data.success) { // if success message from database = true
-                    console.log(data);
-                    renderTable(data.data); 
-                    document.getElementById("message").innerHTML = data.message; // display message from server 
-                }
-                else { // success = false
-                    document.getElementById("message").innerHTML = "Error: " + data.error; 
-                }
-            })
 }
 
 
@@ -67,7 +67,7 @@ function searchBookings(ref) {
 }
 
 
- // send table to html page
+// send table to html page
 function renderTable(data) {
     if (!data || data.length === 0) {
         document.querySelector(".content").innerHTML = "<p>No bookings found.</p>";
@@ -89,8 +89,11 @@ function renderTable(data) {
     `;
     // fill table with data 
     data.forEach(row => {
-        
-        let datetime = row.pickup_date + " "+ row.pickup_time;
+        // date in as 2026-03-31 + 11:30:00
+        // need to reverse date and delim with /, and take off seconds
+        let formattedDate = row.pickup_date.split("-").reverse().join('/'); // ["2026", "03", "30"] -> reverse it and rebuild , "30/03/2026"
+        let formattedTime = row.pickup_time.split(":").slice(0, 2).join(":"); // same process, put into array, and only take the first two elements
+        let datetime = formattedDate + " " + formattedTime;
         html += `
         <tr>
             <td>${row.booking_ref}</td>       
