@@ -1,12 +1,12 @@
 // load bookings within 2 hours of the time on page load
 document.addEventListener("DOMContentLoaded", function () {
-    loadDefaultBookings();
+    // loadDefaultBookings(); - load default ones immediately.
     console.log("DOM is ready!");
 
 });
 function queryBookings() {
     const ref = document.getElementById("bsearch").value.trim() // remove whitespace from string e.g. "BRN0001  " -> "BRN0001";
-    // case 1
+    // case 1, query with no params
     if (ref === "") {
         loadDefaultBookings();
         return;
@@ -67,13 +67,13 @@ function searchBookings(ref) {
 }
 
 
-
+ // send table to html page
 function renderTable(data) {
     if (!data || data.length === 0) {
         document.querySelector(".content").innerHTML = "<p>No bookings found.</p>";
         return;
     }
-    
+    // craft table
     let html = `
     <table border="1">
         <tr>
@@ -87,12 +87,13 @@ function renderTable(data) {
             <th>Assign</th>
         </tr>
     `;
+    // fill table with data 
     data.forEach(row => {
         
         let datetime = row.pickup_date + " "+ row.pickup_time;
         html += `
         <tr>
-            <td>${row.booking_id}</td>       
+            <td>${row.booking_ref}</td>       
             <td>${row.cname}</td>
             <td>${row.phone}</td>            
             <td>${row.sbname}</td>
@@ -108,8 +109,8 @@ function renderTable(data) {
         </tr>
         `;
     });
-    html += "</table>";
-    document.querySelector(".content").innerHTML = html;
+    html += "</table>"; // append closing tag
+    document.querySelector(".content").innerHTML = html; // get content div and set the data to the html we just created which is a fully populated table
 }
 
 function assignBooking(id) {

@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 
 header('Content-Type: application/json'); // set response header to json
 
-session_start(); // CAN DELETE?
+session_start(); // CAN DELETE? - doesnt do anything 
 
 // DB config
 require_once("../../files/sqlinfoassignment.inc.php");
@@ -41,14 +41,15 @@ if ($action === "search") {
         $stmt = $connection->prepare("SELECT * FROM bookings WHERE booking_ref = ?");
         $stmt->bind_param("s", $input);
         $message = "Searching for booking with ref: ". $input;
-    } else {
+    } else { // case if the search param is empty
         // default bookings (within 2 hours)
         $stmt = $connection->prepare("
             SELECT * FROM bookings 
             WHERE status = 'unassigned'
             AND pickup_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 2 HOUR)
+            AND pickup_date = CURRENT_DATE() 
         ");
-        $message = "Displaying bookings due in the next 2 hours";
+        $message = "Displaying bookings due in the next 2 hours"; // display message to be put on page
     }
    
     if (!$stmt->execute()) {
