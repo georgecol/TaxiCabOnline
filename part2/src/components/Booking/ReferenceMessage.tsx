@@ -1,10 +1,8 @@
-import type React from "react";
-
 export default function ReferenceMessage({
   message,
 }: {
   message: string;
-}): React.Element | null {
+}): JSX.Element | null {
   if (!message) return null;
 
   return (
