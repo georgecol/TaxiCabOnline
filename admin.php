@@ -49,7 +49,7 @@ if ($action === "search") {
             AND pickup_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 2 HOUR)
             AND pickup_date = CURRENT_DATE() 
         ");
-        $message = "Displaying bookings due in the next 2 hours"; // display message to be put on page
+        $message = "Displaying bookings unassigned and due in the next 2 hours"; // display message to be put on page
     }
    
     if (!$stmt->execute()) {
@@ -60,7 +60,8 @@ if ($action === "search") {
             "success" => false,
             "error" => $stmt->error
         ]);
-        exit;
+        $connection->close(); // cleanup
+        exit; 
     }
 
     $result = $stmt->get_result();
@@ -77,20 +78,22 @@ if ($action === "search") {
         "message" => $message,
         "data" => $data
     ]);
-
+    $connection->close();
     exit;
 }
 
 // assign a booking
 if ($action === "assign") {
     // get id from request 
-    $id = $_POST['id'] ?? '';
+    $id = $_POST['id'] ?? ''; 
+    $ref = $_POST['ref'] ?? ''; // get booking reference from request parameters
     // if no id, return false with error message
     if (empty($id)) {
         echo json_encode([
             "success" => false,
             "message" => "Missing booking ID"
         ]);
+        $connection->close();
         exit;
     } 
     // if have id, prepare sql statement to edit booking
@@ -105,15 +108,16 @@ if ($action === "assign") {
     if ($stmt->execute()) { // send confirmation message if true
         echo json_encode([
             "success" => true,
-            "message" => "Booking $id successfully assigned"
+            "message" => "Congratulations! Booking Request $ref has been assigned!"
         ]);
     } else {
         echo json_encode([ // error message if false
             "success" => false,
-            "message" => "Error assigning booking",
+            "message" => "Error assigning booking $ref",
             "error" => $stmt->error
         ]);
     }
+    $connection->close();
     exit; // exit to not run the rest of the code
 }
 
@@ -142,7 +146,7 @@ if($action === "loadDefault")
 
     $data = [];
     // fill array with row results from result set
-    // should only be 1 result for search, and mu
+    // should be zero or more results in the data associative array
     while ($row = $result->fetch_assoc()) {
         $data[] = $row;
     }
@@ -151,11 +155,13 @@ if($action === "loadDefault")
         "success" => true,
         "data" => $data
     ]);
+    $connection->close();
     exit; // exit once done so last return doesnt run
     }
 
 //last catch
 // invalid action, runs if none of the above if statements fire
+// executes because all other cases have an exit call after they have finished
 // hence invalid action
 echo json_encode([
     "success" => false,

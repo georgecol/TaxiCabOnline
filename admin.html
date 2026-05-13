@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Admin Panel</title>
 </head>
+
 <body>
     <h2>Admin: Booking lookup</h2>
     <a href="booking.html">booking</a>
-    <p>Enter a booking reference 
-        <input type="text" name="bsearch" id="bsearch" placeholder="e.g. BRN00000">
-        <input type="button" name="sbutton" value="Search Bookings" onclick="queryBookings()">
-    </p>
-    <div id="message"></div>
-    <div class="content"></div>
+    <form id="searchForm">
+        <p>Enter a booking reference
+            <input type="text" name="bsearch" id="bsearch" placeholder="e.g. BRN00000">
+            <input type="button" name="sbutton" value="Search Bookings" onclick="queryBookings()">
+        </p>
+    </form>
 
-    <script src="admin.js"></script>  
+    <div id="message"></div>
+    <br>
+    <div id="assignConfirm"></div>
+    <br>
+    <div class="content"></div> 
+    <script src="admin.js"></script>
 </body>
+
 </html>

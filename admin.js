@@ -4,7 +4,13 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM is ready!");
 
 });
-function queryBookings() {
+// handle enter button as a form of submit
+document.getElementById("searchForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    queryBookings();
+});
+
+function queryBookings(refreshAssign = true) { // if refresh assign not passed, give true as default 
     const ref = document.getElementById("bsearch").value.trim() // remove whitespace from string e.g. "BRN0001  " -> "BRN0001";
     // case 1, query with no params
     if (ref === "") {
@@ -16,12 +22,13 @@ function queryBookings() {
     const pattern = /^BRN[0-9]{5}$/; // regex pattern to match booking ref - BRN00001 - MUST be BRN then any 5 numbers
     if (!pattern.test(ref)) {
         alert("Error, input correct booking reference");
-        return false;
+        return;
     }
     else {
-        searchBookings(ref);
+        searchBookings(ref, refreshAssign);
     }
 }
+
 
 
 function loadDefaultBookings() {
@@ -34,6 +41,7 @@ function loadDefaultBookings() {
     })
         .then(res => res.json()) // parse to json object 
         .then(data => {
+            clearAssignBox();
             if (data.success) { // if success message from database = true
                 console.log(data);
                 renderTable(data.data);
@@ -47,7 +55,7 @@ function loadDefaultBookings() {
 
 
 
-function searchBookings(ref) {
+function searchBookings(ref, refreshAssign) {
     // case 2, ref not empty, load booking value
     fetch("admin.php", {
         method: "POST",
@@ -56,6 +64,7 @@ function searchBookings(ref) {
     })
         .then(res => res.json())
         .then(data => {
+            if (refreshAssign) clearAssignBox();
             if (data.success) {
                 console.log(data);
                 renderTable(data.data);
@@ -104,7 +113,7 @@ function renderTable(data) {
             <td>${datetime}</td>
             <td>${row.status}</td>
             <td>
-                <button onclick="assignBooking('${row.booking_id}')"
+                <button onclick="assignBooking('${row.booking_id}', '${row.booking_ref}')"
                 ${row.status === "assigned" ? "disabled" : ""}>
                 Assign
                 </button>
@@ -116,15 +125,24 @@ function renderTable(data) {
     document.querySelector(".content").innerHTML = html; // get content div and set the data to the html we just created which is a fully populated table
 }
 
-function assignBooking(id) {
+function assignBooking(id, bookingref) {
     fetch("admin.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=assign&id=" + encodeURIComponent(id)
+        body: new URLSearchParams({ // cleaner way of doing it, instead of encodeURIComponent(id)
+            action: "assign",
+            id: id,
+            ref: bookingref
+        })
     })
         .then(res => res.json())
         .then(data => {
-            document.getElementById("message").innerHTML = data.message;
-            queryBookings();
+            document.getElementById("assignConfirm").innerHTML = data.message;
+            // refreshTable();
+            queryBookings(false); // to refresh table, gets rid of message however
         });
+}
+// helper function to cut down on repeat code
+function clearAssignBox() {
+    document.getElementById("assignConfirm").innerHTML = ""; // clear assign confirm box (just incase)
 }
