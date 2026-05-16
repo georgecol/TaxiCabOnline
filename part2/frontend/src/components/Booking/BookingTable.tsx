@@ -1,4 +1,5 @@
-import type { Booking } from "../types/booking";
+import type { Booking } from "../../types/booking";
+import type { JSX } from "react";
 
 type Props = {
   bookings: Booking[];

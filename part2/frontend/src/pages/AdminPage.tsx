@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { searchBookings, assignBooking } from "../api/adminAPI";
 import type { Booking } from "../types/booking";
-
+import type { JSX } from "react";
 import SearchBar from "../components/Booking/SearchBar";
 import BookingTable from "../components/Booking/BookingTable";
 import AssignMessage from "../components/admin/AssignMessage";

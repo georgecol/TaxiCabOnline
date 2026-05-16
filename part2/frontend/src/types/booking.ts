@@ -16,3 +16,16 @@ export interface BookingResponse {
   error?: string;
   data?: Booking[];
 }
+
+export interface BookingFormValues {
+  cname: string;
+  phone: string;
+  unumber?: string;
+  snumber?: string;
+  stname?: string;
+  sbname?: string;
+  dsbname?: string;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:MM
+  [key: string]: string | undefined;
+}
