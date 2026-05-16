@@ -20,7 +20,7 @@ export default function BookingTable({
           const time = b.pickup_time.split(":").slice(0, 2).join(":");
 
           return (
-            <tr key={b.booking_id}>
+            <tr key={b._id}>
               <td>{b.booking_ref}</td>
               <td>{b.cname}</td>
               <td>{b.phone}</td>
@@ -32,7 +32,7 @@ export default function BookingTable({
               <td>
                 <button
                   disabled={b.status === "assigned"}
-                  onClick={() => onAssign(b.booking_id, b.booking_ref)}
+                  onClick={() => onAssign(b._id, b.booking_ref)}
                   className="btn"
                 >
                   Assign

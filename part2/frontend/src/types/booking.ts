@@ -1,5 +1,5 @@
 export interface Booking {
-  booking_id: string;
+  _id: string;
   booking_ref: string;
   cname: string;
   phone: string;
@@ -12,9 +12,9 @@ export interface Booking {
 
 export interface BookingResponse {
   success: boolean;
-  message?: string;
+  message: string;
+  data?: Booking;
   error?: string;
-  data?: Booking[];
 }
 
 export interface BookingFormValues {

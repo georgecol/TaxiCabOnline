@@ -1,45 +1,22 @@
-const { MongoClient } = require("mongodb");
-require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const { connectDB } = require("./db/mongo");
 
-const username = encodeURIComponent(process.env.dbuser);
-const password = encodeURIComponent(process.env.dbpassword);
-const cluster = "cluster0.ygc2gib.mongodb.net";
 
-const uri = `mongodb+srv://${username}:${password}@${cluster}/?appName=Cluster0`;
+const bookingRoutes = require("./routes/bookings");
 
-const client = new MongoClient(uri);
+const app = express();
+const PORT = 5000;
 
-async function run() {
-  try {
-    await client.connect();
+app.use(cors());
+app.use(express.json());
 
-    const database = client.db("TaxiCabOnline");
-    const collection = database.collection("bookings");
+// routes
+app.use("/api/bookings", bookingRoutes);
 
-    // ✅ sample booking (for testing)
-    const booking = {
-      booking_id: "BKG999",
-      booking_ref: "REF99999",
-      cname: "George Collier",
-      phone: "0211234567",
-      sbname: "Auckland Airport",
-      dsbname: "Sky Tower",
-      pickup_date: "2026-05-16",
-      pickup_time: "10:30:00",
-      status: "unassigned",
-    };
-
-    // ✅ insert
-    const result = await collection.insertOne(booking);
-    console.log("Inserted ID:", result.insertedId);
-
-    // ✅ fetch all bookings from collection "bookings"
-    const cursor = collection.find(); 
-
-    await cursor.forEach((doc) => console.log(doc)); // iterate over it and print them all
-  } finally {
-    await client.close();
-  }
-}
-
-run().catch(console.dir);
+// start server after DB connects
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
+});

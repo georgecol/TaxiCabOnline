@@ -21,7 +21,6 @@ export interface AssignResponse {
  */
 export async function searchBookings(ref: string): Promise<AdminResponse> {
   const url = new URL(`${BASE_URL}/bookings`);
-
   if (ref) {
     url.searchParams.append("ref", ref);
   }
