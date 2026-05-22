@@ -2,6 +2,9 @@ export interface Booking {
   _id: string;
   booking_ref: string;
   cname: string;
+  unumber?: string;
+  snumber?: string;
+  stname?: string;
   phone: string;
   sbname: string;
   dsbname: string;
@@ -25,7 +28,10 @@ export interface BookingFormValues {
   stname?: string;
   sbname?: string;
   dsbname?: string;
-  date: string; // YYYY-MM-DD
-  time: string; // HH:MM
-  [key: string]: string | undefined;
+  date: string;
+  time: string;
+
+  pickup_lat?: number;
+  pickup_lng?: number;
+  pickup_address?: string;
 }

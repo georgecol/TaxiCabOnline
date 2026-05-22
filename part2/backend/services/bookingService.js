@@ -6,17 +6,19 @@ async function getNextBookingRef() {
     .collection("counters")
     .findOneAndUpdate(
       { _id: "booking_ref" },
-      {
-        $inc: { seq: 1 },
-        $setOnInsert: { seq: 1 }
-      },
+      { $inc: { seq: 1 } },
       {
         upsert: true,
-        returnDocument: "after"
+        returnDocument: "false"
       }
     );
 
-  const num = counter.value.seq;
+  if (!counter || !counter.seq) {
+    console.log(client.db);
+    console.log(counter.value, "counter:",counter);
+    throw new Error("Counter not initialized properly");
+  }
+  const num = counter.seq;
 
   return `BRN${String(num).padStart(5, "0")}`;
 }

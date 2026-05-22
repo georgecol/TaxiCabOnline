@@ -3,9 +3,11 @@ require("dotenv").config();
 
 const username = encodeURIComponent(process.env.dbuser);
 const password = encodeURIComponent(process.env.dbpassword);
+const appName = encodeURIComponent(process.env.appname);
+// console.log("user: ",username," password: ",password);
 const cluster = "cluster0.ygc2gib.mongodb.net";
 
-const uri = `mongodb+srv://${username}:${password}@${cluster}/?appName=Cluster0`;
+const uri = `mongodb+srv://${username}:${password}@${cluster}/?appName=${appName}`;
 
 const client = new MongoClient(uri);
 
