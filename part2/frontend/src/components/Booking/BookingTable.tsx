@@ -14,10 +14,25 @@ export default function BookingTable({
 
   return (
     <table className="w-full border">
+      <thead>
+        <tr>
+          <th>Booking Ref</th>
+          <th>Customer</th>
+          <th>Phone</th>
+          <th>Pickup Suburb</th>
+          <th>Dropoff Suburb</th>
+          <th>Date & Time</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
       <tbody>
         {bookings.map((b) => {
-          const date = b.pickup_date.split("-").reverse().join("/");
-          const time = b.pickup_time.split(":").slice(0, 2).join(":");
+          const date =
+            b.pickup_date?.split("-")?.reverse()?.join("/") ?? "N/A";
+          const time =
+            b.pickup_time?.split(":")?.slice(0, 2)?.join(":") ?? "";
 
           return (
             <tr key={b._id}>
@@ -26,7 +41,9 @@ export default function BookingTable({
               <td>{b.phone}</td>
               <td>{b.sbname}</td>
               <td>{b.dsbname}</td>
-              <td>{date} {time}</td>
+              <td>
+                {date} {time}
+              </td>
               <td>{b.status}</td>
 
               <td>
