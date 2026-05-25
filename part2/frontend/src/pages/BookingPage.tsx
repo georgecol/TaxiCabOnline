@@ -29,11 +29,6 @@ export default function BookingPage(): JSX.Element {
     if (lat !== undefined && lng !== undefined) setDestPosition([lat, lng]);
   }
 
-  function handleMapPickup(lat: number, lng: number, address: string) {
-    setPickupPosition([lat, lng]);
-    setPickupAddress(address);
-  }
-
   function handleMapDest(lat: number, lng: number, address: string) {
     setDestPosition([lat, lng]);
     setDestAddress(address);
@@ -87,10 +82,9 @@ export default function BookingPage(): JSX.Element {
       <ReferenceMessage message={message} booking={booking} />
 
       <div className="mt-4">
+        <p className="text-sm text-gray-500 mb-1">Click the map to set your destination:</p>
         <BookingMap
-          pickupPosition={pickupPosition}
           destPosition={destPosition}
-          onSelectPickup={handleMapPickup}
           onSelectDest={handleMapDest}
         />
       </div>

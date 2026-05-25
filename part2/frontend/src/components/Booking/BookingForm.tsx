@@ -18,19 +18,37 @@ type NominatimResult = {
   lon: string;
 };
 
+async function reverseGeocode(lat: number, lng: number): Promise<string> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+      { headers: { Accept: "application/json" } }
+    );
+    if (!res.ok) return "Unknown address";
+    const data = await res.json();
+    return data.display_name || "Unknown address";
+  } catch {
+    return "Unknown address";
+  }
+}
+
 function AddressAutocomplete({
   value,
   onChange,
   placeholder,
   error,
+  showGeolocation = false,
 }: {
   value: string;
   onChange: (address: string, lat?: number, lng?: number) => void;
   placeholder: string;
   error?: string;
+  showGeolocation?: boolean;
 }) {
   const [suggestions, setSuggestions] = useState<NominatimResult[]>([]);
   const [open, setOpen] = useState(false);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState("");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -79,17 +97,52 @@ function AddressAutocomplete({
     setOpen(false);
   }
 
+  function handleGeolocate() {
+    if (!navigator.geolocation) {
+      setGeoError("Geolocation not supported by your browser");
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError("");
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        const address = await reverseGeocode(lat, lng);
+        onChange(address, lat, lng);
+        setGeoLoading(false);
+      },
+      () => {
+        setGeoError("Location access denied");
+        setGeoLoading(false);
+      }
+    );
+  }
+
   return (
     <div ref={containerRef} className="relative">
-      <input
-        type="text"
-        value={value}
-        onChange={handleChange}
-        className="input w-full"
-        placeholder={placeholder}
-        autoComplete="off"
-      />
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={value}
+          onChange={handleChange}
+          className="input flex-1"
+          placeholder={placeholder}
+          autoComplete="off"
+        />
+        {showGeolocation && (
+          <button
+            type="button"
+            onClick={handleGeolocate}
+            disabled={geoLoading}
+            className="px-3 py-2 text-sm bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 text-blue-700 whitespace-nowrap disabled:opacity-50"
+            title="Use current location"
+          >
+            {geoLoading ? "Locating…" : "Use my location"}
+          </button>
+        )}
+      </div>
       {error && <div className="text-sm text-red-600">{error}</div>}
+      {geoError && <div className="text-sm text-orange-600">{geoError}</div>}
       {open && (
         <ul className="absolute z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto text-sm">
           {suggestions.map((item, i) => (
@@ -160,8 +213,9 @@ export default function BookingForm({
       <AddressAutocomplete
         value={pickupAddress}
         onChange={onPickupAddressChange}
-        placeholder="Pickup address — type to search or click the map"
+        placeholder="Pickup address"
         error={errors.pickup_address}
+        showGeolocation
       />
 
       <AddressAutocomplete
