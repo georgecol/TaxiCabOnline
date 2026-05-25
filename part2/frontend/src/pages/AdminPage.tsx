@@ -16,7 +16,7 @@ export default function AdminPage(): JSX.Element {
   }
 
   useEffect(() => {
-    // void loadBookings(); // default load on page load
+    void loadBookings();
   }, []);
 
   async function handleSearch(ref: string): Promise<void> {

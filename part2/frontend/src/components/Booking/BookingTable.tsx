@@ -19,8 +19,8 @@ export default function BookingTable({
           <th>Booking Ref</th>
           <th>Customer</th>
           <th>Phone</th>
-          <th>Pickup Suburb</th>
-          <th>Dropoff Suburb</th>
+          <th>Pickup Address</th>
+          <th>Destination Address</th>
           <th>Date & Time</th>
           <th>Status</th>
           <th>Action</th>
@@ -39,8 +39,8 @@ export default function BookingTable({
               <td>{b.booking_ref}</td>
               <td>{b.cname}</td>
               <td>{b.phone}</td>
-              <td>{b.sbname}</td>
-              <td>{b.dsbname}</td>
+              <td>{b.pickup_address ?? "—"}</td>
+              <td>{b.dest_address ?? "—"}</td>
               <td>
                 {date} {time}
               </td>

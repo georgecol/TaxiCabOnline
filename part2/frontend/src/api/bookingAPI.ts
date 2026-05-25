@@ -2,6 +2,11 @@ import type { BookingFormValues, BookingResponse } from "../types/booking";
 
 const BASE_URL = "http://localhost:5000/api";
 
+function authHeader(): Record<string, string> {
+  const token = localStorage.getItem("taxi_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export async function createBooking(
   values: BookingFormValues
 ): Promise<BookingResponse> {
@@ -9,6 +14,7 @@ export async function createBooking(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...authHeader(),
     },
     body: JSON.stringify(values),
   });

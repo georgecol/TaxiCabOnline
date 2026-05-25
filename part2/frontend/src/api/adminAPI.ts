@@ -2,6 +2,11 @@ import type { Booking } from "../types/booking";
 
 const BASE_URL = "http://localhost:5000/api";
 
+function authHeader(): Record<string, string> {
+  const token = localStorage.getItem("taxi_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export interface AdminResponse {
   success: boolean;
   message?: string;
@@ -15,18 +20,13 @@ export interface AssignResponse {
   error?: string;
 }
 
-/**
- * SEARCH BOOKINGS
- * GET /api/bookings?ref=BRN001
- */
 export async function searchBookings(ref: string): Promise<AdminResponse> {
   const url = new URL(`${BASE_URL}/bookings`);
-  if (ref) {
-    url.searchParams.append("ref", ref);
-  }
+  if (ref) url.searchParams.append("ref", ref);
 
   const res = await fetch(url.toString(), {
     method: "GET",
+    headers: authHeader(),
   });
 
   const json = await res.json().catch(() => ({
@@ -34,25 +34,17 @@ export async function searchBookings(ref: string): Promise<AdminResponse> {
     message: "Invalid JSON response",
   }));
 
-  if (!res.ok) {
-    throw new Error(json?.message || `HTTP ${res.status}`);
-  }
+  if (!res.ok) throw new Error(json?.message || `HTTP ${res.status}`);
 
   return json;
 }
 
-/**
- * ASSIGN BOOKING
- * PATCH /api/bookings/:id/assign
- */
-export async function assignBooking(
-  id: string,
-  ref: string
-): Promise<AssignResponse> {
+export async function assignBooking(id: string, ref: string): Promise<AssignResponse> {
   const res = await fetch(`${BASE_URL}/bookings/${id}/assign`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      ...authHeader(),
     },
     body: JSON.stringify({ ref }),
   });
@@ -62,9 +54,7 @@ export async function assignBooking(
     message: "Invalid JSON response",
   }));
 
-  if (!res.ok) {
-    throw new Error(json?.message || `HTTP ${res.status}`);
-  }
+  if (!res.ok) throw new Error(json?.message || `HTTP ${res.status}`);
 
   return json;
 }

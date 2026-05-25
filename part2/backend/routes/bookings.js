@@ -2,11 +2,12 @@ const express = require("express");
 const { ObjectId } = require("mongodb");
 const { getDB } = require("../db/mongo");
 const { getNextBookingRef } = require("../services/bookingService");
+const { requireAuth, requireAdmin } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 // CREATE BOOKING
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
   try {
     const collection = getDB().collection("bookings");
 
@@ -40,7 +41,7 @@ router.post("/", async (req, res) => {
 });
 
 // GET BOOKINGS (filtered + time rule)
-router.get("/", async (req, res) => {
+router.get("/", requireAuth, requireAdmin, async (req, res) => {
   try {
     const collection = getDB().collection("bookings");
 
@@ -79,32 +80,20 @@ router.get("/", async (req, res) => {
 
     const bookings = await collection.find(query).toArray();
 
-    /**
-     * -----------------------------
-     * 2. TIME FILTER (2 hour rule)
-     * -----------------------------
-     */
-    const now = new Date();
-
-    const filtered = bookings.filter((b) => {
+    // Only apply the 2-hour window filter on the default load (no ref search)
+    const data = ref ? bookings : bookings.filter((b) => {
       if (!b.pickup_date || !b.pickup_time) return false;
 
       const pickupDateTime = new Date(`${b.pickup_date}T${b.pickup_time}`);
+      const now = new Date();
+      const diffMs = pickupDateTime - now;
 
-      const isSameDay =
-        pickupDateTime.toDateString() === now.toDateString();
-
-      if (!isSameDay) return false;
-
-      const diffHours =
-        Math.abs(pickupDateTime - now) / (1000 * 60 * 60);
-
-      return diffHours <= 2;
+      return diffMs >= 0 && diffMs <= 2 * 60 * 60 * 1000;
     });
 
     res.json({
       success: true,
-      data: filtered,
+      data,
     });
   } catch (err) {
     res.status(500).json({
@@ -115,7 +104,7 @@ router.get("/", async (req, res) => {
 });
 
 // ASSIGN BOOKING
-router.patch("/:id/assign", async (req, res) => {
+router.patch("/:id/assign", requireAuth, requireAdmin, async (req, res) => {
   try {
     const collection = getDB().collection("bookings");
     const { id } = req.params;

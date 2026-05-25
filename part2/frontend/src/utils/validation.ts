@@ -16,20 +16,28 @@ export function validateBooking(values: BookingFormValues): {
     errors.phone = "Phone must be 10–12 digits";
   }
 
-  if (!values.date) {
-    errors.date = "Date is required";
+  if (!values.pickup_address || values.pickup_address.trim() === "") {
+    errors.pickup_address = "Pickup address is required";
   }
 
-  if (!values.time) {
-    errors.time = "Time is required";
+  if (!values.dest_address || values.dest_address.trim() === "") {
+    errors.dest_address = "Destination address is required";
   }
 
-  if (values.date && values.time) {
-    const dt = new Date(`${values.date}T${values.time}`);
+  if (!values.pickup_date) {
+    errors.pickup_date = "Date is required";
+  }
+
+  if (!values.pickup_time) {
+    errors.pickup_time = "Time is required";
+  }
+
+  if (values.pickup_date && values.pickup_time) {
+    const dt = new Date(`${values.pickup_date}T${values.pickup_time}`);
     if (isNaN(dt.getTime())) {
-      errors.date = errors.date || "Invalid date/time";
+      errors.pickup_date = errors.pickup_date || "Invalid date/time";
     } else if (dt.getTime() < Date.now()) {
-      errors.time = "Pickup time cannot be in the past";
+      errors.pickup_time = "Pickup time cannot be in the past";
     }
   }
 
