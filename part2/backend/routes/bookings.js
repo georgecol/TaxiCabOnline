@@ -15,6 +15,7 @@ router.post("/", requireAuth, async (req, res) => {
 
     const newBooking = {
       ...req.body,
+      username: req.user.username,
       booking_ref: bookingRef,
       status: "unassigned",
       created_at: new Date()
@@ -37,6 +38,21 @@ router.post("/", requireAuth, async (req, res) => {
       success: false,
       message: err.message
     });
+  }
+});
+
+// GET MY BOOKINGS (current user, all time)
+router.get("/my", requireAuth, async (req, res) => {
+  try {
+    const bookings = await getDB()
+      .collection("bookings")
+      .find({ username: req.user.username })
+      .sort({ pickup_date: -1, pickup_time: -1 })
+      .toArray();
+
+    res.json({ success: true, data: bookings });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
@@ -106,31 +122,71 @@ router.get("/", requireAuth, requireAdmin, async (req, res) => {
 // ASSIGN BOOKING
 router.patch("/:id/assign", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const collection = getDB().collection("bookings");
     const { id } = req.params;
-    const { ref } = req.body;
+    const { driverId } = req.body;
 
-    const result = await collection.updateOne(
+    let driver;
+    try {
+      driver = await getDB().collection("users").findOne(
+        { _id: new ObjectId(driverId), role: "driver" },
+        { projection: { password: 0 } }
+      );
+    } catch {
+      return res.status(400).json({ success: false, message: "Invalid driver ID" });
+    }
+
+    if (!driver) return res.status(404).json({ success: false, message: "Driver not found" });
+
+    const result = await getDB().collection("bookings").updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
           status: "assigned",
-          driver_ref: ref,
+          driver_id: driver._id,
+          driver_name: driver.name,
+          driver_phone: driver.phone,
+          driver_username: driver.username,
         },
       }
     );
 
     if (result.matchedCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Booking not found",
-      });
+      return res.status(404).json({ success: false, message: "Booking not found" });
     }
 
-    res.json({
-      success: true,
-      message: "Booking assigned",
-    });
+    res.json({ success: true, message: `Assigned to ${driver.name}` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// EDIT BOOKING (owner only, unassigned only)
+router.patch("/:id", requireAuth, async (req, res) => {
+  try {
+    const collection = getDB().collection("bookings");
+    const { id } = req.params;
+
+    let existing;
+    try {
+      existing = await collection.findOne({ _id: new ObjectId(id) });
+    } catch {
+      return res.status(400).json({ success: false, message: "Invalid booking ID" });
+    }
+
+    if (!existing) return res.status(404).json({ success: false, message: "Booking not found" });
+    if (existing.username !== req.user.username) return res.status(403).json({ success: false, message: "Not your booking" });
+    if (existing.status === "assigned") return res.status(409).json({ success: false, message: "Cannot edit an assigned booking" });
+
+    const { cname, phone, pickup_address, pickup_lat, pickup_lng, dest_address, dest_lat, dest_lng, pickup_date, pickup_time } = req.body;
+
+    const update = { cname, phone, pickup_address, pickup_lat, pickup_lng, dest_address, dest_lat, dest_lng, pickup_date, pickup_time };
+    Object.keys(update).forEach((k) => update[k] === undefined && delete update[k]);
+
+    await collection.updateOne({ _id: new ObjectId(id) }, { $set: update });
+
+    const updated = await collection.findOne({ _id: new ObjectId(id) });
+
+    res.json({ success: true, message: "Booking updated", data: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

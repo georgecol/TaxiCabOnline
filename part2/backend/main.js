@@ -5,6 +5,7 @@ const { connectDB } = require("./db/mongo");
 
 const bookingRoutes = require("./routes/bookings");
 const authRoutes = require("./routes/auth");
+const driverRoutes = require("./routes/drivers");
 
 const app = express();
 const PORT = 5000;
@@ -15,6 +16,7 @@ app.use(express.json());
 // routes
 app.use("/api/auth", authRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/drivers", driverRoutes);
 
 // start server after DB connects
 connectDB().then(() => {

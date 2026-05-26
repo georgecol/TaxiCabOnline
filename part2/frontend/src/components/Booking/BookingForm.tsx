@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import type { BookingFormValues } from "../../types/booking";
 import { validateBooking } from "../../utils/validation";
 import type { JSX } from "react";
+import BookingMap from "../map/BookingMap";
 
 type Props = {
   onSubmit: (values: BookingFormValues) => void | Promise<void>;
@@ -10,6 +11,12 @@ type Props = {
   onPickupAddressChange: (address: string, lat?: number, lng?: number) => void;
   destAddress: string;
   onDestAddressChange: (address: string, lat?: number, lng?: number) => void;
+  pickupPosition: [number, number] | null;
+  destPosition: [number, number] | null;
+  onSelectDest: (lat: number, lng: number, address: string) => void;
+  defaultName?: string;
+  defaultPhone?: string;
+  mode?: "create" | "edit";
 };
 
 type NominatimResult = {
@@ -65,15 +72,8 @@ function AddressAutocomplete({
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const text = e.target.value;
     onChange(text);
-
     if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    if (text.trim().length < 3) {
-      setSuggestions([]);
-      setOpen(false);
-      return;
-    }
-
+    if (text.trim().length < 3) { setSuggestions([]); setOpen(false); return; }
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(
@@ -85,9 +85,7 @@ function AddressAutocomplete({
           setSuggestions(data);
           setOpen(data.length > 0);
         }
-      } catch {
-        // ignore
-      }
+      } catch { /* ignore */ }
     }, 400);
   }
 
@@ -98,23 +96,16 @@ function AddressAutocomplete({
   }
 
   function handleGeolocate() {
-    if (!navigator.geolocation) {
-      setGeoError("Geolocation not supported by your browser");
-      return;
-    }
+    if (!navigator.geolocation) { setGeoError("Geolocation not supported"); return; }
     setGeoLoading(true);
     setGeoError("");
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
-        const address = await reverseGeocode(lat, lng);
-        onChange(address, lat, lng);
+        onChange(await reverseGeocode(lat, lng), lat, lng);
         setGeoLoading(false);
       },
-      () => {
-        setGeoError("Location access denied");
-        setGeoLoading(false);
-      }
+      () => { setGeoError("Location access denied"); setGeoLoading(false); }
     );
   }
 
@@ -135,7 +126,6 @@ function AddressAutocomplete({
             onClick={handleGeolocate}
             disabled={geoLoading}
             className="px-3 py-2 text-sm bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 text-blue-700 whitespace-nowrap disabled:opacity-50"
-            title="Use current location"
           >
             {geoLoading ? "Locating…" : "Use my location"}
           </button>
@@ -144,13 +134,9 @@ function AddressAutocomplete({
       {error && <div className="text-sm text-red-600">{error}</div>}
       {geoError && <div className="text-sm text-orange-600">{geoError}</div>}
       {open && (
-        <ul className="absolute z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto text-sm">
+        <ul className="absolute z-[9999] w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto text-sm">
           {suggestions.map((item, i) => (
-            <li
-              key={i}
-              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-              onMouseDown={() => handleSelect(item)}
-            >
+            <li key={i} className="px-3 py-2 hover:bg-gray-100 cursor-pointer" onMouseDown={() => handleSelect(item)}>
               {item.display_name}
             </li>
           ))}
@@ -160,6 +146,27 @@ function AddressAutocomplete({
   );
 }
 
+function getNowDateTime() {
+  const d = new Date(Date.now() + 15 * 60 * 1000);
+  const date = d.toLocaleDateString("en-CA");
+  const time = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  return { date, time };
+}
+
+function formatPickupDisplay(date: string, time: string): string {
+  if (!date || !time) return "";
+  const dt = new Date(`${date}T${time}`);
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  let dateLabel: string;
+  if (dt.toDateString() === today.toDateString()) dateLabel = "Today";
+  else if (dt.toDateString() === tomorrow.toDateString()) dateLabel = "Tomorrow";
+  else dateLabel = dt.toLocaleDateString("en-NZ", { weekday: "short", day: "numeric", month: "short" });
+  const timeLabel = dt.toLocaleTimeString("en-NZ", { hour: "numeric", minute: "2-digit", hour12: true });
+  return `${dateLabel} at ${timeLabel}`;
+}
+
 export default function BookingForm({
   onSubmit,
   disabled,
@@ -167,14 +174,18 @@ export default function BookingForm({
   onPickupAddressChange,
   destAddress,
   onDestAddressChange,
+  pickupPosition,
+  destPosition,
+  onSelectDest,
+  defaultName = "",
+  defaultPhone = "",
+  mode = "create",
 }: Props): JSX.Element {
-  const [values, setValues] = useState({
-    cname: "",
-    phone: "",
-    pickup_date: "",
-    pickup_time: "",
+  const [values, setValues] = useState(() => {
+    const { date, time } = getNowDateTime();
+    return { cname: defaultName, phone: defaultPhone, pickup_date: date, pickup_time: time };
   });
-
+  const [advanced, setAdvanced] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof BookingFormValues, string>>>({});
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -182,34 +193,74 @@ export default function BookingForm({
     setValues((s) => ({ ...s, [name]: value }));
   }
 
+  function resetToNow() {
+    const { date, time } = getNowDateTime();
+    setValues((s) => ({ ...s, pickup_date: date, pickup_time: time }));
+    setAdvanced(false);
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formValues: BookingFormValues = {
-      ...values,
-      pickup_address: pickupAddress,
-      dest_address: destAddress,
-    };
+    const formValues: BookingFormValues = { ...values, pickup_address: pickupAddress, dest_address: destAddress };
     const check = validateBooking(formValues);
-    if (!check.ok) {
-      setErrors(check.errors || {});
-      return;
-    }
+    if (!check.ok) { setErrors(check.errors || {}); return; }
     setErrors({});
     await onSubmit(formValues);
   }
 
+  const showMap = pickupAddress.trim().length > 0;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <div>
-        <input name="cname" value={values.cname} onChange={handleChange} className="input" placeholder="Name" />
-        {errors.cname && <div className="text-sm text-red-600">{errors.cname}</div>}
+    <form onSubmit={handleSubmit} className="space-y-4">
+
+      {/* Top row: name/phone left | date-time right */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="h-full flex flex-col bg-gray-50 border border-gray-200 rounded-lg px-3 py-3 space-y-2">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Details</p>
+          <div>
+            <input name="cname" value={values.cname} onChange={handleChange} className="input w-full bg-white" placeholder="Name" />
+            {errors.cname && <div className="text-sm text-red-600">{errors.cname}</div>}
+          </div>
+          <div>
+            <input name="phone" value={values.phone} onChange={handleChange} className="input w-full bg-white" placeholder="Phone" />
+            {errors.phone && <div className="text-sm text-red-600">{errors.phone}</div>}
+          </div>
+        </div>
+
+        <div>
+          {!advanced ? (
+            <div className="h-full flex flex-col justify-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-3">
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Pickup time</p>
+              <p className="text-sm font-semibold text-gray-800 leading-snug">
+                {formatPickupDisplay(values.pickup_date, values.pickup_time)}
+              </p>
+              <button
+                type="button"
+                onClick={() => setAdvanced(true)}
+                className="mt-2 text-xs text-blue-600 hover:underline self-start"
+              >
+                Book in advance
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div>
+                <input type="date" name="pickup_date" value={values.pickup_date} onChange={handleChange} className="input w-full" />
+                {errors.pickup_date && <div className="text-sm text-red-600">{errors.pickup_date}</div>}
+              </div>
+              <div>
+                <input type="time" name="pickup_time" value={values.pickup_time} onChange={handleChange} className="input w-full" />
+                {errors.pickup_time && <div className="text-sm text-red-600">{errors.pickup_time}</div>}
+              </div>
+              <button type="button" onClick={resetToNow} className="text-xs text-gray-500 hover:underline">
+                Use current time
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div>
-        <input name="phone" value={values.phone} onChange={handleChange} className="input" placeholder="Phone" />
-        {errors.phone && <div className="text-sm text-red-600">{errors.phone}</div>}
-      </div>
-
+      {/* Pickup address */}
       <AddressAutocomplete
         value={pickupAddress}
         onChange={onPickupAddressChange}
@@ -218,6 +269,7 @@ export default function BookingForm({
         showGeolocation
       />
 
+      {/* Destination address */}
       <AddressAutocomplete
         value={destAddress}
         onChange={onDestAddressChange}
@@ -225,19 +277,21 @@ export default function BookingForm({
         error={errors.dest_address}
       />
 
-      <div className="grid grid-cols-2 gap-2">
-        <div>
-          <input type="date" name="pickup_date" value={values.pickup_date} onChange={handleChange} className="input" />
-          {errors.pickup_date && <div className="text-sm text-red-600">{errors.pickup_date}</div>}
-        </div>
-        <div>
-          <input type="time" name="pickup_time" value={values.pickup_time} onChange={handleChange} className="input" />
-          {errors.pickup_time && <div className="text-sm text-red-600">{errors.pickup_time}</div>}
-        </div>
-      </div>
+      {/* Map — revealed once pickup is set */}
+      {showMap && (
+        <BookingMap
+          pickupPosition={pickupPosition}
+          destPosition={destPosition}
+          onSelectDest={onSelectDest}
+        />
+      )}
 
-      <button className="btn" disabled={disabled}>
-        Book
+      {/* Book button */}
+      <button
+        className="w-full py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-base font-semibold rounded-lg shadow-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        disabled={disabled}
+      >
+        {disabled ? (mode === "edit" ? "Updating…" : "Booking…") : (mode === "edit" ? "Update Booking" : "Book Taxi")}
       </button>
     </form>
   );

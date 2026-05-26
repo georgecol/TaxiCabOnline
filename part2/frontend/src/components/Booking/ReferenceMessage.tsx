@@ -40,7 +40,7 @@ export default function ReferenceMessage({ message, booking }: Props): JSX.Eleme
             )}
 
             <p><span className="font-semibold">Pickup Date:</span></p>
-            <p>{booking.pickup_date}</p>
+            <p>{booking.pickup_date?.split("-").reverse().join("/")}</p>
 
             <p><span className="font-semibold">Pickup Time:</span></p>
             <p>{booking.pickup_time}</p>

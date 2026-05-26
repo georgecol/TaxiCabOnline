@@ -12,6 +12,21 @@ export interface Booking {
   pickup_date: string;  // YYYY-MM-DD
   pickup_time: string;  // HH:MM:SS
   status: "unassigned" | "assigned";
+  username?: string;
+  driver_name?: string;
+  driver_phone?: string;
+  driver_username?: string;
+}
+
+export interface Driver {
+  _id: string;
+  username: string;
+  name: string;
+  phone: string;
+  role: "driver";
+  lat: number;
+  lng: number;
+  location_label: string;
 }
 
 export interface BookingResponse {

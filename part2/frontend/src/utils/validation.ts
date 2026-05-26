@@ -11,8 +11,8 @@ export function validateBooking(values: BookingFormValues): {
     errors.cname = "Name is required";
   }
 
-  const phoneRegex = /^\d{10,12}$/;
-  if (!values.phone || !phoneRegex.test(values.phone)) {
+  const phoneDigits = (values.phone || "").replace(/\s/g, "");
+  if (!/^\d{10,12}$/.test(phoneDigits)) {
     errors.phone = "Phone must be 10–12 digits";
   }
 
