@@ -11,10 +11,7 @@ const userRoutes = require("./routes/users");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigin = process.env.FRONTEND_URL?.replace(/\/$/, "");
-app.use(cors({
-  origin: allowedOrigin || "*",
-}));
+app.use(cors({ origin: true }));
 app.use(express.json());
 
 // health check
@@ -29,6 +26,6 @@ app.use("/api/users", userRoutes);
 // start server after DB connects
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on ${process.env.SERVER_URl}${PORT}`);
   });
 });
