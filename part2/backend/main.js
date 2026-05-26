@@ -11,7 +11,10 @@ const userRoutes = require("./routes/users");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: true }));
+const allowedOrigin = (process.env.FRONTEND_URL ?? "").replace(/\/$/, "");
+app.use(cors({
+  origin: allowedOrigin || "http://localhost:5173",
+}));
 app.use(express.json());
 
 // health check
