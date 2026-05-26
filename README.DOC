@@ -493,8 +493,8 @@ Example (values will differ in your database):
 ================================================================================
 
 This project was developed with the assistance of Claude Code (Anthropic's AI
-coding assistant), used throughout the full development lifecycle. The
-following is an honest reflection on how AI assistance shaped the work.
+coding assistant), used throughout the second half of the development lifecycle. The initial
+refactor to Vite + React was done using codex in vscode, although this ran into many issues,
 
 8.1  CONTRIBUTION TO THE PROCESS
 ----------------------------------

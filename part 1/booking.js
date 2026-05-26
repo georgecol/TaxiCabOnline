@@ -1,4 +1,5 @@
-
+//George Collier
+//23221769
 // Restraints: not null,certain fields must be numeric so on so forth.
 // certain fields
 

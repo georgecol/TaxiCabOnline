@@ -1,9 +1,6 @@
-// load bookings within 2 hours of the time on page load
-document.addEventListener("DOMContentLoaded", function () {
-    // loadDefaultBookings(); - load default ones immediately.
-    console.log("DOM is ready!");
+// George Collier
+// 23221769
 
-});
 // handle enter button as a form of submit
 document.getElementById("searchForm").addEventListener("submit", function (e) {
     e.preventDefault();
@@ -138,7 +135,6 @@ function assignBooking(id, bookingref) {
         .then(res => res.json())
         .then(data => {
             document.getElementById("assignConfirm").innerHTML = data.message;
-            // refreshTable();
             queryBookings(false); // to refresh table, gets rid of message however
         });
 }
