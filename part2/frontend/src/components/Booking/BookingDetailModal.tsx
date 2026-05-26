@@ -53,24 +53,24 @@ export default function BookingDetailModal({ booking, onClose, onEdit, onCancel 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 overflow-y-auto py-8 px-4"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 overflow-y-auto py-8 px-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-lg"
+        className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-lg"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-5 py-4 border-b flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <div>
-            <p className="font-bold text-gray-900 text-lg">{booking.booking_ref}</p>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="font-bold text-gray-900 dark:text-gray-100 text-lg">{booking.booking_ref}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {booking.status === "assigned" ? "Confirmed" : "Pending"}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
           >
             &times;
           </button>
@@ -79,19 +79,19 @@ export default function BookingDetailModal({ booking, onClose, onEdit, onCancel 
         <div className="px-5 py-4 space-y-4">
           {/* Booking details */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
-            <span className="font-medium text-gray-500">Customer</span>
-            <span className="text-gray-800">{booking.cname}</span>
+            <span className="font-medium text-gray-500 dark:text-gray-400">Customer</span>
+            <span className="text-gray-800 dark:text-gray-200">{booking.cname}</span>
 
-            <span className="font-medium text-gray-500">Phone</span>
-            <span className="text-gray-800">{booking.phone}</span>
+            <span className="font-medium text-gray-500 dark:text-gray-400">Phone</span>
+            <span className="text-gray-800 dark:text-gray-200">{booking.phone}</span>
 
-            <span className="font-medium text-gray-500">Pickup Time</span>
-            <span className="text-gray-800">{formatDate(booking.pickup_date)} at {formatTime(booking.pickup_time)}</span>
+            <span className="font-medium text-gray-500 dark:text-gray-400">Pickup Time</span>
+            <span className="text-gray-800 dark:text-gray-200">{formatDate(booking.pickup_date)} at {formatTime(booking.pickup_time)}</span>
 
             {booking.created_at && (
               <>
-                <span className="font-medium text-gray-500">Booking Placed</span>
-                <span className="text-gray-800">
+                <span className="font-medium text-gray-500 dark:text-gray-400">Booking Placed</span>
+                <span className="text-gray-800 dark:text-gray-200">
                   {new Date(booking.created_at).toLocaleString("en-NZ", {
                     day: "numeric", month: "short", year: "numeric",
                     hour: "numeric", minute: "2-digit", hour12: true,
@@ -102,32 +102,32 @@ export default function BookingDetailModal({ booking, onClose, onEdit, onCancel 
 
             {booking.pickup_address && (
               <>
-                <span className="font-medium text-gray-500">From</span>
-                <span className="text-gray-800">{booking.pickup_address}</span>
+                <span className="font-medium text-gray-500 dark:text-gray-400">From</span>
+                <span className="text-gray-800 dark:text-gray-200">{booking.pickup_address}</span>
               </>
             )}
 
             {booking.dest_address && (
               <>
-                <span className="font-medium text-gray-500">To</span>
-                <span className="text-gray-800">{booking.dest_address}</span>
+                <span className="font-medium text-gray-500 dark:text-gray-400">To</span>
+                <span className="text-gray-800 dark:text-gray-200">{booking.dest_address}</span>
               </>
             )}
           </div>
 
           {/* Driver section */}
           {booking.driver_name && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-              <p className="text-xs font-medium text-blue-400 uppercase tracking-wide mb-2">Your Driver</p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700/40 rounded-lg px-4 py-3">
+              <p className="text-xs font-medium text-blue-400 dark:text-blue-400 uppercase tracking-wide mb-2">Your Driver</p>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-blue-900">{booking.driver_name}</p>
-                  <p className="text-sm text-blue-700">{booking.driver_phone}</p>
+                  <p className="font-semibold text-blue-900 dark:text-blue-200">{booking.driver_name}</p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">{booking.driver_phone}</p>
                 </div>
                 {booking.driver_location_label && (
                   <div className="text-right">
                     <p className="text-xs text-blue-400">Currently in</p>
-                    <p className="text-sm font-medium text-blue-800">{booking.driver_location_label}</p>
+                    <p className="text-sm font-medium text-blue-800 dark:text-blue-200">{booking.driver_location_label}</p>
                   </div>
                 )}
               </div>
@@ -137,7 +137,7 @@ export default function BookingDetailModal({ booking, onClose, onEdit, onCancel 
           {/* Map */}
           {hasMap && (
             <div>
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
+              <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">
                 {driverPosition ? "Route & Driver Location" : "Route"}
               </p>
               <BookingMap
@@ -148,7 +148,7 @@ export default function BookingDetailModal({ booking, onClose, onEdit, onCancel 
                 readOnly
                 autoFit
               />
-              <div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-500">
+              <div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-500 dark:text-gray-400">
                 {pickupPosition && (
                   <span className="flex items-center gap-1">
                     <span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500"></span> Pickup
@@ -170,10 +170,10 @@ export default function BookingDetailModal({ booking, onClose, onEdit, onCancel 
 
           {/* Edit / Cancel actions — only for unassigned bookings */}
           {canModify && (onEdit || onCancel) && (
-            <div className="border-t border-gray-100 pt-4">
+            <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
               {confirmCancel ? (
-                <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 space-y-3">
-                  <p className="text-sm font-medium text-red-800">
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/40 rounded-lg px-4 py-3 space-y-3">
+                  <p className="text-sm font-medium text-red-800 dark:text-red-300">
                     Cancel this booking? This cannot be undone.
                   </p>
                   <div className="flex gap-2">
@@ -187,7 +187,7 @@ export default function BookingDetailModal({ booking, onClose, onEdit, onCancel 
                     <button
                       onClick={() => setConfirmCancel(false)}
                       disabled={cancelling}
-                      className="flex-1 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex-1 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
                       Keep booking
                     </button>
@@ -198,7 +198,7 @@ export default function BookingDetailModal({ booking, onClose, onEdit, onCancel 
                   {onEdit && (
                     <button
                       onClick={() => onEdit(booking)}
-                      className="flex-1 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex-1 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
                       Edit Booking
                     </button>
@@ -206,7 +206,7 @@ export default function BookingDetailModal({ booking, onClose, onEdit, onCancel 
                   {onCancel && (
                     <button
                       onClick={() => setConfirmCancel(true)}
-                      className="flex-1 py-2 border border-red-300 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors"
+                      className="flex-1 py-2 border border-red-300 dark:border-red-700/60 text-red-600 dark:text-red-400 text-sm font-medium rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                     >
                       Cancel Booking
                     </button>

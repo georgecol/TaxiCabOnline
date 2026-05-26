@@ -71,17 +71,40 @@ export default function BookingPage({ onViewBookings, initialEditBooking }: Prop
     setFormKey((k) => k + 1);
   }
 
+  async function forwardGeocode(text: string): Promise<[number, number] | null> {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(text)}&limit=1&countrycodes=nz`,
+        { headers: { Accept: "application/json" } }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!data.length) return null;
+      return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+    } catch {
+      return null;
+    }
+  }
+
   async function handleSubmit(values: BookingFormValues): Promise<void> {
     setLoading(true);
     setError("");
     setMessage("");
     try {
+      let resolvedPickup = pickupPosition;
+      let resolvedDest = destPosition;
+      if (pickupAddress.trim() && !resolvedPickup) {
+        resolvedPickup = await forwardGeocode(pickupAddress);
+      }
+      if (destAddress.trim() && !resolvedDest) {
+        resolvedDest = await forwardGeocode(destAddress);
+      }
       const payload = {
         ...values,
-        pickup_lat: pickupPosition?.[0],
-        pickup_lng: pickupPosition?.[1],
-        dest_lat: destPosition?.[0],
-        dest_lng: destPosition?.[1],
+        pickup_lat: resolvedPickup?.[0],
+        pickup_lng: resolvedPickup?.[1],
+        dest_lat: resolvedDest?.[0],
+        dest_lng: resolvedDest?.[1],
       };
       const res = editingBookingId
         ? await updateBooking(editingBookingId, payload)

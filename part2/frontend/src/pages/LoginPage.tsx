@@ -39,19 +39,19 @@ export default function LoginPage(): JSX.Element {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        <h1 className="text-2xl font-bold mb-2 text-center">Taxi Cab System</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+      <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-md border border-gray-200 dark:border-gray-800 w-full max-w-sm">
+        <h1 className="text-2xl font-bold mb-2 text-center text-gray-900 dark:text-gray-100">Taxi Cab System</h1>
 
-        <div className="flex border-b mb-6">
+        <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
           <button
-            className={`flex-1 py-2 text-sm font-medium ${view === "login" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${view === "login" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
             onClick={() => switchView("login")}
           >
             Sign In
           </button>
           <button
-            className={`flex-1 py-2 text-sm font-medium ${view === "register" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${view === "register" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
             onClick={() => switchView("register")}
           >
             Create Account
@@ -59,7 +59,7 @@ export default function LoginPage(): JSX.Element {
         </div>
 
         {error && (
-          <div className="mb-4 p-2 bg-red-100 text-red-800 rounded text-sm">{error}</div>
+          <div className="mb-4 p-2 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded text-sm">{error}</div>
         )}
 
         {view === "login" ? (

@@ -20,9 +20,9 @@ function roleLabel(role: AppUser["role"]): string {
 
 function RoleBadge({ role }: { role: AppUser["role"] }) {
   const styles: Record<AppUser["role"], string> = {
-    testuser: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
-    driver: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
-    admin: "bg-purple-50 text-purple-700 ring-1 ring-purple-200",
+    testuser: "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-700/50",
+    driver: "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-200 dark:ring-emerald-700/50",
+    admin: "bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 ring-1 ring-purple-200 dark:ring-purple-700/50",
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${styles[role]}`}>
@@ -42,10 +42,13 @@ function formatJoined(dateStr?: string, id?: string): string {
   return "—";
 }
 
+const thClass = "px-4 py-2.5 font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap text-left";
+const tdBase = "px-4 py-3";
+
 function EmptyRow({ cols }: { cols: number }) {
   return (
     <tr>
-      <td colSpan={cols} className="px-4 py-10 text-center text-sm text-gray-400">
+      <td colSpan={cols} className="px-4 py-10 text-center text-sm text-gray-400 dark:text-gray-500">
         No users found.
       </td>
     </tr>
@@ -56,25 +59,25 @@ function CustomerTable({ users }: { users: AppUser[] }) {
   return (
     <table className="w-full text-sm">
       <thead>
-        <tr className="border-b border-gray-200 text-left">
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Name</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Username</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Phone</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Email</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Joined</th>
+        <tr className="border-b border-gray-200 dark:border-gray-700">
+          <th className={thClass}>Name</th>
+          <th className={thClass}>Username</th>
+          <th className={thClass}>Phone</th>
+          <th className={thClass}>Email</th>
+          <th className={thClass}>Joined</th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-100">
+      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
         {users.length === 0 ? (
           <EmptyRow cols={5} />
         ) : (
           users.map((u) => (
-            <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
-              <td className="px-4 py-3 text-gray-500">@{u.username}</td>
-              <td className="px-4 py-3 text-gray-600">{u.phone}</td>
-              <td className="px-4 py-3 text-gray-500">{u.email || <span className="text-gray-300">—</span>}</td>
-              <td className="px-4 py-3 text-gray-400">{formatJoined(u.created_at, u._id)}</td>
+            <tr key={u._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+              <td className={`${tdBase} font-medium text-gray-900 dark:text-gray-100`}>{u.name}</td>
+              <td className={`${tdBase} text-gray-500 dark:text-gray-400`}>@{u.username}</td>
+              <td className={`${tdBase} text-gray-600 dark:text-gray-300`}>{u.phone}</td>
+              <td className={`${tdBase} text-gray-500 dark:text-gray-400`}>{u.email || <span className="text-gray-300 dark:text-gray-600">—</span>}</td>
+              <td className={`${tdBase} text-gray-400 dark:text-gray-500`}>{formatJoined(u.created_at, u._id)}</td>
             </tr>
           ))
         )}
@@ -87,36 +90,36 @@ function DriverTable({ users }: { users: AppUser[] }) {
   return (
     <table className="w-full text-sm">
       <thead>
-        <tr className="border-b border-gray-200 text-left">
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Name</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Username</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Phone</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Email</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Current Location</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Joined</th>
+        <tr className="border-b border-gray-200 dark:border-gray-700">
+          <th className={thClass}>Name</th>
+          <th className={thClass}>Username</th>
+          <th className={thClass}>Phone</th>
+          <th className={thClass}>Email</th>
+          <th className={thClass}>Current Location</th>
+          <th className={thClass}>Joined</th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-100">
+      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
         {users.length === 0 ? (
           <EmptyRow cols={6} />
         ) : (
           users.map((u) => (
-            <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
-              <td className="px-4 py-3 text-gray-500">@{u.username}</td>
-              <td className="px-4 py-3 text-gray-600">{u.phone}</td>
-              <td className="px-4 py-3 text-gray-500">{u.email || <span className="text-gray-300">—</span>}</td>
-              <td className="px-4 py-3">
+            <tr key={u._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+              <td className={`${tdBase} font-medium text-gray-900 dark:text-gray-100`}>{u.name}</td>
+              <td className={`${tdBase} text-gray-500 dark:text-gray-400`}>@{u.username}</td>
+              <td className={`${tdBase} text-gray-600 dark:text-gray-300`}>{u.phone}</td>
+              <td className={`${tdBase} text-gray-500 dark:text-gray-400`}>{u.email || <span className="text-gray-300 dark:text-gray-600">—</span>}</td>
+              <td className={tdBase}>
                 {u.location_label ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-200 dark:ring-emerald-700/50">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
                     {u.location_label}
                   </span>
                 ) : (
-                  <span className="text-gray-400">—</span>
+                  <span className="text-gray-400 dark:text-gray-500">—</span>
                 )}
               </td>
-              <td className="px-4 py-3 text-gray-400">{formatJoined(u.created_at, u._id)}</td>
+              <td className={`${tdBase} text-gray-400 dark:text-gray-500`}>{formatJoined(u.created_at, u._id)}</td>
             </tr>
           ))
         )}
@@ -129,29 +132,29 @@ function AllTable({ users }: { users: AppUser[] }) {
   return (
     <table className="w-full text-sm">
       <thead>
-        <tr className="border-b border-gray-200 text-left">
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Name</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Username</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Phone</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Email</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Role</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Joined</th>
+        <tr className="border-b border-gray-200 dark:border-gray-700">
+          <th className={thClass}>Name</th>
+          <th className={thClass}>Username</th>
+          <th className={thClass}>Phone</th>
+          <th className={thClass}>Email</th>
+          <th className={thClass}>Role</th>
+          <th className={thClass}>Joined</th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-100">
+      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
         {users.length === 0 ? (
           <EmptyRow cols={6} />
         ) : (
           users.map((u) => (
-            <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
-              <td className="px-4 py-3 text-gray-500">@{u.username}</td>
-              <td className="px-4 py-3 text-gray-600">{u.phone}</td>
-              <td className="px-4 py-3 text-gray-500">{u.email || <span className="text-gray-300">—</span>}</td>
-              <td className="px-4 py-3">
+            <tr key={u._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+              <td className={`${tdBase} font-medium text-gray-900 dark:text-gray-100`}>{u.name}</td>
+              <td className={`${tdBase} text-gray-500 dark:text-gray-400`}>@{u.username}</td>
+              <td className={`${tdBase} text-gray-600 dark:text-gray-300`}>{u.phone}</td>
+              <td className={`${tdBase} text-gray-500 dark:text-gray-400`}>{u.email || <span className="text-gray-300 dark:text-gray-600">—</span>}</td>
+              <td className={tdBase}>
                 <RoleBadge role={u.role} />
               </td>
-              <td className="px-4 py-3 text-gray-400">{formatJoined(u.created_at, u._id)}</td>
+              <td className={`${tdBase} text-gray-400 dark:text-gray-500`}>{formatJoined(u.created_at, u._id)}</td>
             </tr>
           ))
         )}
@@ -164,25 +167,25 @@ function AdminUserTable({ users }: { users: AppUser[] }) {
   return (
     <table className="w-full text-sm">
       <thead>
-        <tr className="border-b border-gray-200 text-left">
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Name</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Username</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Phone</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Email</th>
-          <th className="px-4 py-2.5 font-medium text-gray-500 whitespace-nowrap">Joined</th>
+        <tr className="border-b border-gray-200 dark:border-gray-700">
+          <th className={thClass}>Name</th>
+          <th className={thClass}>Username</th>
+          <th className={thClass}>Phone</th>
+          <th className={thClass}>Email</th>
+          <th className={thClass}>Joined</th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-100">
+      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
         {users.length === 0 ? (
           <EmptyRow cols={5} />
         ) : (
           users.map((u) => (
-            <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
-              <td className="px-4 py-3 text-gray-500">@{u.username}</td>
-              <td className="px-4 py-3 text-gray-600">{u.phone}</td>
-              <td className="px-4 py-3 text-gray-500">{u.email || <span className="text-gray-300">—</span>}</td>
-              <td className="px-4 py-3 text-gray-400">{formatJoined(u.created_at, u._id)}</td>
+            <tr key={u._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+              <td className={`${tdBase} font-medium text-gray-900 dark:text-gray-100`}>{u.name}</td>
+              <td className={`${tdBase} text-gray-500 dark:text-gray-400`}>@{u.username}</td>
+              <td className={`${tdBase} text-gray-600 dark:text-gray-300`}>{u.phone}</td>
+              <td className={`${tdBase} text-gray-500 dark:text-gray-400`}>{u.email || <span className="text-gray-300 dark:text-gray-600">—</span>}</td>
+              <td className={`${tdBase} text-gray-400 dark:text-gray-500`}>{formatJoined(u.created_at, u._id)}</td>
             </tr>
           ))
         )}
@@ -221,21 +224,23 @@ export default function UsersTab(): JSX.Element {
   return (
     <div className="space-y-4">
       {/* Sub-tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-fit">
         {GROUP_TABS.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setGroup(key)}
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 ${
               group === key
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             }`}
           >
             {label}
             <span
               className={`text-xs rounded-full px-1.5 py-0 font-medium ${
-                group === key ? "bg-gray-100 text-gray-600" : "bg-gray-200 text-gray-500"
+                group === key
+                  ? "bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
               }`}
             >
               {counts[key]}
@@ -245,9 +250,9 @@ export default function UsersTab(): JSX.Element {
       </div>
 
       {/* Table card */}
-      <div className="border border-gray-200 rounded-xl overflow-hidden">
+      <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
         {loading ? (
-          <p className="px-4 py-10 text-center text-sm text-gray-400">Loading…</p>
+          <p className="px-4 py-10 text-center text-sm text-gray-400 dark:text-gray-500">Loading…</p>
         ) : error ? (
           <p className="px-4 py-10 text-center text-sm text-red-500">{error}</p>
         ) : (

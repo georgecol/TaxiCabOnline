@@ -127,18 +127,22 @@ function AddressAutocomplete({
             type="button"
             onClick={handleGeolocate}
             disabled={geoLoading}
-            className="px-3 py-2 text-sm bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 text-blue-700 whitespace-nowrap disabled:opacity-50"
+            className="px-3 py-2 text-sm bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700/50 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 whitespace-nowrap disabled:opacity-50 transition-colors"
           >
             {geoLoading ? "Locating…" : "Use my location"}
           </button>
         )}
       </div>
-      {error && <div className="text-sm text-red-600">{error}</div>}
-      {geoError && <div className="text-sm text-orange-600">{geoError}</div>}
+      {error && <div className="text-sm text-red-600 dark:text-red-400">{error}</div>}
+      {geoError && <div className="text-sm text-orange-600 dark:text-orange-400">{geoError}</div>}
       {open && (
-        <ul className="absolute z-[9999] w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto text-sm">
+        <ul className="absolute z-[9999] w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto text-sm">
           {suggestions.map((item, i) => (
-            <li key={i} className="px-3 py-2 hover:bg-gray-100 cursor-pointer" onMouseDown={() => handleSelect(item)}>
+            <li
+              key={i}
+              className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 cursor-pointer"
+              onMouseDown={() => handleSelect(item)}
+            >
               {item.display_name}
             </li>
           ))}
@@ -224,29 +228,29 @@ export default function BookingForm({
 
       {/* Top row: name/phone left | date-time right */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="h-full flex flex-col bg-gray-50 border border-gray-200 rounded-lg px-3 py-3 space-y-2">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Details</p>
+        <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3 space-y-2">
+          <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide">Details</p>
           <div>
-            <input name="cname" value={values.cname} onChange={handleChange} className="input w-full bg-white" placeholder="Name" />
-            {errors.cname && <div className="text-sm text-red-600">{errors.cname}</div>}
+            <input name="cname" value={values.cname} onChange={handleChange} className="input w-full" placeholder="Name" />
+            {errors.cname && <div className="text-sm text-red-600 dark:text-red-400">{errors.cname}</div>}
           </div>
           <div>
-            <input name="phone" value={values.phone} onChange={handleChange} className="input w-full bg-white" placeholder="Phone" />
-            {errors.phone && <div className="text-sm text-red-600">{errors.phone}</div>}
+            <input name="phone" value={values.phone} onChange={handleChange} className="input w-full" placeholder="Phone" />
+            {errors.phone && <div className="text-sm text-red-600 dark:text-red-400">{errors.phone}</div>}
           </div>
         </div>
 
         <div>
           {!advanced ? (
-            <div className="h-full flex flex-col justify-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-3">
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Pickup time</p>
-              <p className="text-sm font-semibold text-gray-800 leading-snug">
+            <div className="h-full flex flex-col justify-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3">
+              <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">Pickup time</p>
+              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-snug">
                 {formatPickupDisplay(values.pickup_date, values.pickup_time)}
               </p>
               <button
                 type="button"
                 onClick={() => setAdvanced(true)}
-                className="mt-2 text-xs text-blue-600 hover:underline self-start"
+                className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline self-start"
               >
                 Book in advance
               </button>
@@ -255,13 +259,13 @@ export default function BookingForm({
             <div className="space-y-2">
               <div>
                 <input type="date" name="pickup_date" value={values.pickup_date} onChange={handleChange} className="input w-full" />
-                {errors.pickup_date && <div className="text-sm text-red-600">{errors.pickup_date}</div>}
+                {errors.pickup_date && <div className="text-sm text-red-600 dark:text-red-400">{errors.pickup_date}</div>}
               </div>
               <div>
                 <input type="time" name="pickup_time" value={values.pickup_time} onChange={handleChange} className="input w-full" />
-                {errors.pickup_time && <div className="text-sm text-red-600">{errors.pickup_time}</div>}
+                {errors.pickup_time && <div className="text-sm text-red-600 dark:text-red-400">{errors.pickup_time}</div>}
               </div>
-              <button type="button" onClick={resetToNow} className="text-xs text-gray-500 hover:underline">
+              <button type="button" onClick={resetToNow} className="text-xs text-gray-500 dark:text-gray-400 hover:underline">
                 Use current time
               </button>
             </div>

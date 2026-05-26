@@ -20,11 +20,11 @@ function formatTime(time: string): string {
 
 function StatusBadge({ status }: { status: Booking["status"] }) {
   return status === "assigned" ? (
-    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
       Confirmed
     </span>
   ) : (
-    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
       Pending
     </span>
   );
@@ -32,25 +32,25 @@ function StatusBadge({ status }: { status: Booking["status"] }) {
 
 function AssignmentCard({ booking, onView }: { booking: Booking; onView: (b: Booking) => void }) {
   return (
-    <div className="border border-gray-200 rounded-lg p-4 space-y-2 text-sm">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-2 text-sm bg-white dark:bg-gray-900">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <span className="font-semibold text-gray-800">{booking.booking_ref}</span>
+        <span className="font-semibold text-gray-800 dark:text-gray-200">{booking.booking_ref}</span>
         <div className="flex items-center gap-2">
           <StatusBadge status={booking.status} />
           <button
             onClick={() => onView(booking)}
-            className="px-3 py-0.5 text-xs font-medium border border-gray-300 rounded-full text-gray-600 hover:bg-gray-50 transition-colors"
+            className="px-3 py-0.5 text-xs font-medium border border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
             View
           </button>
         </div>
       </div>
 
-      <p className="text-gray-700 text-xs font-medium">
+      <p className="text-gray-700 dark:text-gray-300 text-xs font-medium">
         Pickup: {formatDate(booking.pickup_date)} at {formatTime(booking.pickup_time)}
       </p>
       {booking.created_at && (
-        <p className="text-gray-400 text-xs">
+        <p className="text-gray-400 dark:text-gray-500 text-xs">
           Placed: {new Date(booking.created_at).toLocaleString("en-NZ", {
             day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true,
           })}
@@ -58,20 +58,20 @@ function AssignmentCard({ booking, onView }: { booking: Booking; onView: (b: Boo
       )}
 
       {booking.pickup_address && (
-        <p className="text-gray-700">
+        <p className="text-gray-700 dark:text-gray-300">
           <span className="font-medium">From:</span> {booking.pickup_address}
         </p>
       )}
       {booking.dest_address && (
-        <p className="text-gray-700">
+        <p className="text-gray-700 dark:text-gray-300">
           <span className="font-medium">To:</span> {booking.dest_address}
         </p>
       )}
 
-      <div className="pt-2 border-t border-gray-100">
-        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Customer</p>
-        <p className="font-semibold text-gray-800">{booking.cname}</p>
-        <p className="text-xs text-gray-500">{booking.phone}</p>
+      <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
+        <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">Customer</p>
+        <p className="font-semibold text-gray-800 dark:text-gray-200">{booking.cname}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{booking.phone}</p>
       </div>
     </div>
   );
@@ -87,7 +87,7 @@ function TabSection({
   onView: (b: Booking) => void;
 }) {
   if (bookings.length === 0) {
-    return <p className="text-sm text-gray-400">{emptyText}</p>;
+    return <p className="text-sm text-gray-400 dark:text-gray-500">{emptyText}</p>;
   }
   return (
     <div className="space-y-3">
@@ -136,9 +136,9 @@ export default function DriverBookingsPage(): JSX.Element {
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">My Assignments</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Assignments</h1>
 
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-gray-200 dark:border-gray-700">
         {(
           [
             ["upcoming", "Upcoming", upcoming.length],
@@ -151,13 +151,15 @@ export default function DriverBookingsPage(): JSX.Element {
             className={`px-5 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
               tab === key
                 ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             }`}
           >
             {label}
             <span
               className={`text-xs rounded-full px-1.5 font-medium ${
-                tab === key ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"
+                tab === key
+                  ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
               }`}
             >
               {count}
@@ -166,8 +168,8 @@ export default function DriverBookingsPage(): JSX.Element {
         ))}
       </div>
 
-      {loading && <p className="text-sm text-gray-500">Loading…</p>}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {loading && <p className="text-sm text-gray-500 dark:text-gray-400">Loading…</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
       {!loading && !error && (
         <>
