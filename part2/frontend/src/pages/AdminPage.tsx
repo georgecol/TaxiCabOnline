@@ -1,37 +1,192 @@
 import { useEffect, useState } from "react";
-import { searchBookings, assignBooking, getDrivers } from "../api/adminAPI";
+import { searchBookings, assignBooking, getDrivers, getAllBookings } from "../api/adminAPI";
 import type { Booking, Driver } from "../types/booking";
 import type { JSX } from "react";
-import SearchBar from "../components/admin/SearchBar";
-import BookingTable from "../components/Booking/BookingTable";
 import AssignMessage from "../components/admin/AssignMessage";
 import DriverPickerModal from "../components/admin/DriverPickerModal";
+import BookingDetailModal from "../components/Booking/BookingDetailModal";
+import UsersTab from "../components/admin/UsersTab";
+
+type AdminTab = "current" | "history" | "users";
+
+function formatDate(date: string): string {
+  return date?.split("-").reverse().join("/") ?? "";
+}
+
+function formatTime(time: string): string {
+  if (!time) return "";
+  const [h, m] = time.split(":");
+  const d = new Date();
+  d.setHours(Number(h), Number(m));
+  return d.toLocaleTimeString("en-NZ", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function StatusBadge({ status }: { status: Booking["status"] }) {
+  return status === "assigned" ? (
+    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+      Assigned
+    </span>
+  ) : (
+    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+      Unassigned
+    </span>
+  );
+}
+
+function AdminBookingCard({
+  booking,
+  showDriverLocation,
+  onAssign,
+  onView,
+}: {
+  booking: Booking;
+  showDriverLocation: boolean;
+  onAssign: (b: Booking) => void;
+  onView: (b: Booking) => void;
+}) {
+  return (
+    <div className="border border-gray-200 rounded-lg p-4 space-y-2 text-sm">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <span className="font-semibold text-gray-800">{booking.booking_ref}</span>
+        <div className="flex items-center gap-2">
+          <StatusBadge status={booking.status} />
+          <button
+            onClick={() => onView(booking)}
+            className="px-3 py-0.5 text-xs font-medium border border-gray-300 rounded-full text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            View
+          </button>
+          {booking.status === "unassigned" && (
+            <button
+              onClick={() => onAssign(booking)}
+              className="px-3 py-0.5 text-xs font-medium bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+            >
+              Assign
+            </button>
+          )}
+        </div>
+      </div>
+
+      <p className="text-gray-500">
+        {formatDate(booking.pickup_date)} at {formatTime(booking.pickup_time)}
+      </p>
+
+      {booking.pickup_address && (
+        <p className="text-gray-700">
+          <span className="font-medium">From:</span> {booking.pickup_address}
+        </p>
+      )}
+      {booking.dest_address && (
+        <p className="text-gray-700">
+          <span className="font-medium">To:</span> {booking.dest_address}
+        </p>
+      )}
+
+      <div className="pt-2 border-t border-gray-100">
+        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Customer</p>
+        <p className="font-semibold text-gray-800">{booking.cname}</p>
+        <p className="text-xs text-gray-500">{booking.phone}</p>
+      </div>
+
+      {booking.driver_name && (
+        <div className="pt-2 border-t border-gray-100">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Driver</p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="font-semibold text-gray-800">{booking.driver_name}</p>
+              <p className="text-xs text-gray-500">{booking.driver_phone}</p>
+            </div>
+            {showDriverLocation && booking.driver_location_label && (
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Currently in</p>
+                <p className="text-xs font-medium text-blue-700">{booking.driver_location_label}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BookingSection({
+  title,
+  bookings,
+  emptyText,
+  showDriverLocation,
+  onAssign,
+  onView,
+}: {
+  title: string;
+  bookings: Booking[];
+  emptyText: string;
+  showDriverLocation: boolean;
+  onAssign: (b: Booking) => void;
+  onView: (b: Booking) => void;
+}) {
+  return (
+    <div>
+      <h2 className="text-lg font-semibold text-gray-700 mb-3">{title}</h2>
+      {bookings.length === 0 ? (
+        <p className="text-sm text-gray-400">{emptyText}</p>
+      ) : (
+        <div className="space-y-3">
+          {bookings.map((b) => (
+            <AdminBookingCard
+              key={b._id}
+              booking={b}
+              showDriverLocation={showDriverLocation}
+              onAssign={onAssign}
+              onView={onView}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AdminPage(): JSX.Element {
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [tab, setTab] = useState<AdminTab>("current");
+  const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
+  const [futureBookings, setFutureBookings] = useState<Booking[]>([]);
+  const [historyBookings, setHistoryBookings] = useState<Booking[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
   const [assigningBooking, setAssigningBooking] = useState<Booking | null>(null);
+  const [viewingBooking, setViewingBooking] = useState<Booking | null>(null);
 
-  async function loadBookings(ref: string = ""): Promise<void> {
-    const res = await searchBookings(ref);
-    setBookings(res.data ?? []);
+  async function reloadBookings(): Promise<void> {
+    const [upcoming, future, history] = await Promise.all([
+      searchBookings(""),
+      getAllBookings("future"),
+      getAllBookings("history"),
+    ]);
+    setUpcomingBookings(upcoming.data ?? []);
+    setFutureBookings(future.data ?? []);
+    setHistoryBookings(history.data ?? []);
   }
 
   useEffect(() => {
-    void loadBookings();
-    getDrivers().then((res) => setDrivers(res.data ?? []));
+    Promise.all([
+      searchBookings(""),
+      getAllBookings("future"),
+      getAllBookings("history"),
+      getDrivers(),
+    ])
+      .then(([upcoming, future, history, driversRes]) => {
+        setUpcomingBookings(upcoming.data ?? []);
+        setFutureBookings(future.data ?? []);
+        setHistoryBookings(history.data ?? []);
+        setDrivers(driversRes.data ?? []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setMessage("Failed to load bookings");
+        setLoading(false);
+      });
   }, []);
-
-  async function handleSearch(ref: string): Promise<void> {
-    await loadBookings(ref);
-    setMessage(ref ? `Search results for "${ref}"` : "Showing all bookings for the next 2 hours");
-  }
-
-  function handleAssignClick(id: string): void {
-    const booking = bookings.find((b) => b._id === id) ?? null;
-    setAssigningBooking(booking);
-  }
 
   async function handleDriverSelect(driverId: string): Promise<void> {
     if (!assigningBooking) return;
@@ -39,21 +194,79 @@ export default function AdminPage(): JSX.Element {
     try {
       const res = await assignBooking(assigningBooking._id, driverId);
       setMessage(res.message);
-    } catch (err: any) {
-      setMessage(err?.message || "Assignment failed");
+    } catch (err: unknown) {
+      setMessage(err instanceof Error ? err.message : "Assignment failed");
     }
-    await loadBookings();
+    await reloadBookings();
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold">Admin Panel</h1>
 
-      <SearchBar onSearch={handleSearch} />
+      <div className="flex border-b border-gray-200">
+        {(
+          [
+            ["current", "Current Bookings"],
+            ["history", "History"],
+            ["users", "Users"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`px-5 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              tab === key
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       <AssignMessage message={message} />
 
-      <BookingTable bookings={bookings} onAssign={handleAssignClick} />
+      {loading ? (
+        <p className="text-sm text-gray-500">Loading…</p>
+      ) : (
+        <>
+          {tab === "current" && (
+            <div className="space-y-10">
+              <BookingSection
+                title="Next 2 Hours"
+                bookings={upcomingBookings}
+                emptyText="No bookings in the next 2 hours."
+                showDriverLocation={true}
+                onAssign={setAssigningBooking}
+                onView={setViewingBooking}
+              />
+              <BookingSection
+                title="Further Ahead"
+                bookings={futureBookings}
+                emptyText="No bookings scheduled further ahead."
+                showDriverLocation={false}
+                onAssign={setAssigningBooking}
+                onView={setViewingBooking}
+              />
+            </div>
+          )}
+
+          {tab === "history" && (
+            <BookingSection
+              title="Past Bookings"
+              bookings={historyBookings}
+              emptyText="No past bookings."
+              showDriverLocation={false}
+              onAssign={setAssigningBooking}
+              onView={setViewingBooking}
+            />
+          )}
+
+          {tab === "users" && <UsersTab />}
+        </>
+      )}
 
       {assigningBooking && (
         <DriverPickerModal
@@ -61,6 +274,13 @@ export default function AdminPage(): JSX.Element {
           drivers={drivers}
           onSelect={handleDriverSelect}
           onClose={() => setAssigningBooking(null)}
+        />
+      )}
+
+      {viewingBooking && (
+        <BookingDetailModal
+          booking={viewingBooking}
+          onClose={() => setViewingBooking(null)}
         />
       )}
     </div>

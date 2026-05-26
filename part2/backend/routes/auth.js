@@ -36,6 +36,7 @@ router.post("/login", async (req, res) => {
       role: user.role,
       name: user.name || "",
       phone: user.phone || "",
+      email: user.email || "",
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -44,15 +45,20 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { username, password, name, phone } = req.body;
+    const { username, password, name, phone, email } = req.body;
 
-    if (!username || !password || !name || !phone) {
+    if (!username || !password || !name || !phone || !email) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
     const phoneRegex = /^\d{10,12}$/;
     if (!phoneRegex.test(phone.replace(/\s/g, ""))) {
       return res.status(400).json({ success: false, message: "Phone must be 10–12 digits" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({ success: false, message: "Invalid email address" });
     }
 
     const collection = getDB().collection("users");
@@ -68,6 +74,7 @@ router.post("/register", async (req, res) => {
       role: "testuser",
       name,
       phone,
+      email: email.trim().toLowerCase(),
       created_at: new Date(),
     });
 
@@ -77,7 +84,7 @@ router.post("/register", async (req, res) => {
       { expiresIn: "8h" }
     );
 
-    res.status(201).json({ success: true, token, username, role: "testuser", name, phone });
+    res.status(201).json({ success: true, token, username, role: "testuser", name, phone, email: email.trim().toLowerCase() });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -85,7 +92,7 @@ router.post("/register", async (req, res) => {
 
 router.put("/profile", requireAuth, async (req, res) => {
   try {
-    const { name, phone } = req.body;
+    const { name, phone, email } = req.body;
 
     if (!name || !phone) {
       return res.status(400).json({ success: false, message: "Name and phone are required" });
@@ -96,12 +103,22 @@ router.put("/profile", requireAuth, async (req, res) => {
       return res.status(400).json({ success: false, message: "Phone must be 10–12 digits" });
     }
 
+    if (email !== undefined) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (email && !emailRegex.test(email.trim())) {
+        return res.status(400).json({ success: false, message: "Invalid email address" });
+      }
+    }
+
+    const update = { name, phone };
+    if (email !== undefined) update.email = email.trim().toLowerCase();
+
     await getDB().collection("users").updateOne(
       { username: req.user.username },
-      { $set: { name, phone } }
+      { $set: update }
     );
 
-    res.json({ success: true, name, phone });
+    res.json({ success: true, name, phone, email: update.email ?? "" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

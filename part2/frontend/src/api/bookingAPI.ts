@@ -1,6 +1,6 @@
 import type { Booking, BookingFormValues, BookingResponse } from "../types/booking";
 
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 function authHeader(): Record<string, string> {
   const token = localStorage.getItem("taxi_token");
@@ -37,6 +37,13 @@ export async function createBooking(
 
 export async function getMyBookings(): Promise<{ success: boolean; data?: Booking[] }> {
   const res = await fetch(`${BASE_URL}/bookings/my`, {
+    headers: authHeader(),
+  });
+  return res.json().catch(() => ({ success: false }));
+}
+
+export async function getDriverAssignments(): Promise<{ success: boolean; data?: Booking[] }> {
+  const res = await fetch(`${BASE_URL}/bookings/driver`, {
     headers: authHeader(),
   });
   return res.json().catch(() => ({ success: false }));

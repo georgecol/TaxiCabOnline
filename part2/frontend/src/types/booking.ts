@@ -21,6 +21,19 @@ export interface Booking {
   driver_location_label?: string;
 }
 
+export interface AppUser {
+  _id: string;
+  username: string;
+  name: string;
+  phone: string;
+  email?: string;
+  role: "testuser" | "driver" | "admin";
+  created_at?: string;
+  lat?: number;
+  lng?: number;
+  location_label?: string;
+}
+
 export interface Driver {
   _id: string;
   username: string;

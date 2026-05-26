@@ -41,6 +41,20 @@ router.post("/", requireAuth, async (req, res) => {
   }
 });
 
+// GET DRIVER ASSIGNMENTS (bookings assigned to the logged-in driver)
+router.get("/driver", requireAuth, async (req, res) => {
+  try {
+    const bookings = await getDB()
+      .collection("bookings")
+      .find({ driver_username: req.user.username })
+      .sort({ pickup_date: -1, pickup_time: -1 })
+      .toArray();
+    res.json({ success: true, data: bookings });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // GET MY BOOKINGS (current user, all time)
 router.get("/my", requireAuth, async (req, res) => {
   try {
@@ -61,61 +75,61 @@ router.get("/", requireAuth, requireAdmin, async (req, res) => {
   try {
     const collection = getDB().collection("bookings");
 
-    const { ref } = req.query;
+    const { ref, scope } = req.query;
 
     let query = {};
 
-    /**
-     * -----------------------------
-     * 1. EXACT or RANGE FILTER
-     * -----------------------------
-     */
     if (ref) {
       // RANGE: "BRN00001-BRN00010"
       if (ref.includes("-")) {
         const [startRef, endRef] = ref.split("-").map((r) => r.trim());
-
-        query.booking_ref = {
-          $gte: startRef,
-          $lte: endRef,
-        };
+        query.booking_ref = { $gte: startRef, $lte: endRef };
       }
-
       // PARTIAL MATCH: "BRN000"
       else if (ref.length < 8) {
-        query.booking_ref = {
-          $regex: `^${ref}`,
-        };
+        query.booking_ref = { $regex: `^${ref}` };
       }
-
       // EXACT MATCH
       else {
         query.booking_ref = ref;
       }
     }
 
-    const bookings = await collection.find(query).toArray();
+    const sortOrder = scope === "history"
+      ? { pickup_date: -1, pickup_time: -1 }
+      : { pickup_date: 1, pickup_time: 1 };
 
-    // Only apply the 2-hour window filter on the default load (no ref search)
-    const data = ref ? bookings : bookings.filter((b) => {
-      if (!b.pickup_date || !b.pickup_time) return false;
+    const bookings = await collection.find(query).sort(sortOrder).toArray();
 
-      const pickupDateTime = new Date(`${b.pickup_date}T${b.pickup_time}`);
+    let data;
+    if (ref) {
+      data = bookings;
+    } else if (scope === "history") {
       const now = new Date();
-      const diffMs = pickupDateTime - now;
+      data = bookings.filter((b) => {
+        if (!b.pickup_date || !b.pickup_time) return false;
+        return new Date(`${b.pickup_date}T${b.pickup_time}`) < now;
+      });
+    } else if (scope === "future") {
+      const cutoff = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      data = bookings.filter((b) => {
+        if (!b.pickup_date || !b.pickup_time) return false;
+        return new Date(`${b.pickup_date}T${b.pickup_time}`) > cutoff;
+      });
+    } else {
+      // default: next 2 hours only
+      const now = new Date();
+      data = bookings.filter((b) => {
+        if (!b.pickup_date || !b.pickup_time) return false;
+        const pickupDateTime = new Date(`${b.pickup_date}T${b.pickup_time}`);
+        const diffMs = pickupDateTime - now;
+        return diffMs >= 0 && diffMs <= 2 * 60 * 60 * 1000;
+      });
+    }
 
-      return diffMs >= 0 && diffMs <= 2 * 60 * 60 * 1000;
-    });
-
-    res.json({
-      success: true,
-      data,
-    });
+    res.json({ success: true, data });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 

@@ -7,6 +7,7 @@ export default function ProfilePage(): JSX.Element {
 
   const [name, setName] = useState(user?.name ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,6 +15,7 @@ export default function ProfilePage(): JSX.Element {
   useEffect(() => {
     setName(user?.name ?? "");
     setPhone(user?.phone ?? "");
+    setEmail(user?.email ?? "");
   }, [user]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -21,7 +23,7 @@ export default function ProfilePage(): JSX.Element {
     setLoading(true);
     setError("");
     setSuccess("");
-    const err = await updateProfile(name, phone);
+    const err = await updateProfile(name, phone, email);
     if (err) {
       setError(err);
     } else {
@@ -61,6 +63,16 @@ export default function ProfilePage(): JSX.Element {
             onChange={(e) => setPhone(e.target.value)}
             className="input w-full"
             placeholder="10–12 digits"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input w-full"
+            placeholder="you@example.com"
           />
         </div>
         <button className="btn" disabled={loading}>

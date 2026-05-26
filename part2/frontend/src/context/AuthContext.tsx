@@ -2,21 +2,22 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 
 const BASE_URL = "http://localhost:5000/api";
 
-export type UserRole = "admin" | "testuser";
+export type UserRole = "admin" | "testuser" | "driver";
 
 export type AuthUser = {
   username: string;
   role: UserRole;
   name: string;
   phone: string;
+  email: string;
 };
 
 type AuthContextType = {
   user: AuthUser | null;
   token: string | null;
   login: (username: string, password: string) => Promise<string | null>;
-  register: (username: string, password: string, name: string, phone: string) => Promise<string | null>;
-  updateProfile: (name: string, phone: string) => Promise<string | null>;
+  register: (username: string, password: string, name: string, phone: string, email: string) => Promise<string | null>;
+  updateProfile: (name: string, phone: string, email: string) => Promise<string | null>;
   logout: () => void;
 };
 
@@ -39,8 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.getItem("taxi_token")
   );
 
-  function applySession(data: { token: string; username: string; role: UserRole; name: string; phone: string }) {
-    const u: AuthUser = { username: data.username, role: data.role, name: data.name, phone: data.phone };
+  function applySession(data: { token: string; username: string; role: UserRole; name: string; phone: string; email?: string }) {
+    const u: AuthUser = { username: data.username, role: data.role, name: data.name, phone: data.phone, email: data.email ?? "" };
     setUser(u);
     setToken(data.token);
     storeUser(u, data.token);
@@ -62,12 +63,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function register(username: string, password: string, name: string, phone: string): Promise<string | null> {
+  async function register(username: string, password: string, name: string, phone: string, email: string): Promise<string | null> {
     try {
       const res = await fetch(`${BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, name, phone }),
+        body: JSON.stringify({ username, password, name, phone, email }),
       });
       const data = await res.json();
       if (!data.success) return data.message || "Registration failed";
@@ -78,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function updateProfile(name: string, phone: string): Promise<string | null> {
+  async function updateProfile(name: string, phone: string, email: string): Promise<string | null> {
     try {
       const res = await fetch(`${BASE_URL}/auth/profile`, {
         method: "PUT",
@@ -86,11 +87,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, phone }),
+        body: JSON.stringify({ name, phone, email }),
       });
       const data = await res.json();
       if (!data.success) return data.message || "Update failed";
-      const updated: AuthUser = { ...user!, name: data.name, phone: data.phone };
+      const updated: AuthUser = { ...user!, name: data.name, phone: data.phone, email: data.email ?? "" };
       setUser(updated);
       localStorage.setItem("taxi_user", JSON.stringify(updated));
       return null;

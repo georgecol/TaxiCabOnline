@@ -10,6 +10,7 @@ export default function LoginPage(): JSX.Element {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,7 +33,7 @@ export default function LoginPage(): JSX.Element {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const err = await register(username, password, name, phone);
+    const err = await register(username, password, name, phone, email);
     if (err) setError(err);
     setLoading(false);
   }
@@ -98,6 +99,13 @@ export default function LoginPage(): JSX.Element {
               onChange={(e) => setPhone(e.target.value)}
               className="input w-full"
               placeholder="Phone number (10–12 digits)"
+            />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input w-full"
+              placeholder="Email address"
             />
             <input
               type="text"

@@ -4,48 +4,45 @@ import BookingPage from "./pages/BookingPage";
 import AdminPage from "./pages/AdminPage";
 import ProfilePage from "./pages/ProfilePage";
 import MyBookingsPage from "./pages/MyBookingsPage";
+import DriverBookingsPage from "./pages/DriverBookingsPage";
 import LoginPage from "./pages/LoginPage";
 
-type Page = "booking" | "admin" | "mybookings" | "profile";
+type Page = "booking" | "admin" | "mybookings" | "assignments" | "profile";
+
+function defaultPage(role: string): Page {
+  if (role === "driver") return "assignments";
+  return "booking";
+}
 
 export default function App(): ReactElement {
   const { user, logout } = useAuth();
-  const [page, setPage] = useState<Page>("booking");
+  const [page, setPage] = useState<Page>(() => defaultPage(user?.role ?? ""));
 
   if (!user) return <LoginPage />;
+
+  const isDriver = user.role === "driver";
+  const isAdmin = user.role === "admin";
+
+  function navBtn(to: Page, label: string) {
+    return (
+      <button
+        key={to}
+        className={`btn ${page === to ? "bg-blue-600 text-white" : ""}`}
+        onClick={() => setPage(to)}
+      >
+        {label}
+      </button>
+    );
+  }
 
   return (
     <div>
       <div className="flex gap-2 p-4 border-b items-center">
-        <button
-          className={`btn ${page === "booking" ? "bg-blue-600 text-white" : ""}`}
-          onClick={() => setPage("booking")}
-        >
-          Home
-        </button>
-
-        {user.role === "admin" && (
-          <button
-            className={`btn ${page === "admin" ? "bg-blue-600 text-white" : ""}`}
-            onClick={() => setPage("admin")}
-          >
-            Admin
-          </button>
-        )}
-
-        <button
-          className={`btn ${page === "mybookings" ? "bg-blue-600 text-white" : ""}`}
-          onClick={() => setPage("mybookings")}
-        >
-          My Bookings
-        </button>
-
-        <button
-          className={`btn ${page === "profile" ? "bg-blue-600 text-white" : ""}`}
-          onClick={() => setPage("profile")}
-        >
-          Profile
-        </button>
+        {!isDriver && navBtn("booking", "Home")}
+        {isAdmin && navBtn("admin", "Admin Dashboard")}
+        {isDriver && navBtn("assignments", "My Assignments")}
+        {!isDriver && navBtn("mybookings", "My Bookings")}
+        {navBtn("profile", "Profile")}
 
         <div className="ml-auto flex items-center gap-3 text-sm text-gray-600">
           <span className="font-medium">{user.name || user.username}</span>
@@ -59,6 +56,7 @@ export default function App(): ReactElement {
       {page === "booking" && <BookingPage />}
       {page === "admin" && <AdminPage />}
       {page === "mybookings" && <MyBookingsPage />}
+      {page === "assignments" && <DriverBookingsPage />}
       {page === "profile" && <ProfilePage />}
     </div>
   );
