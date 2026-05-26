@@ -243,7 +243,7 @@ export default function BookingForm({
         <div>
           {!advanced ? (
             <div className="h-full flex flex-col justify-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3">
-              <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">Pickup time</p>
+              <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">Estimated Pickup time</p>
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-snug">
                 {formatPickupDisplay(values.pickup_date, values.pickup_time)}
               </p>

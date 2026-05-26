@@ -69,3 +69,13 @@ export async function getUsers(): Promise<{ success: boolean; data?: AppUser[] }
   const res = await fetch(`${BASE_URL}/users`, { headers: authHeader() });
   return res.json().catch(() => ({ success: false }));
 }
+
+export async function deleteUser(id: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${BASE_URL}/users/${id}`, {
+    method: "DELETE",
+    headers: authHeader(),
+  });
+  const json = await res.json().catch(() => ({ success: false, message: "Invalid JSON response" }));
+  if (!res.ok) throw new Error(json?.message || `HTTP ${res.status}`);
+  return json;
+}

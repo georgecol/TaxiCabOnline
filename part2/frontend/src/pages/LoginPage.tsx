@@ -41,7 +41,7 @@ export default function LoginPage(): JSX.Element {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
       <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-md border border-gray-200 dark:border-gray-800 w-full max-w-sm">
-        <h1 className="text-2xl font-bold mb-2 text-center text-gray-900 dark:text-gray-100">Taxi Cab System</h1>
+        <h1 className="text-2xl font-bold mb-2 text-center text-gray-900 dark:text-gray-100">Taxi Cab Online</h1>
 
         <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
           <button
@@ -80,7 +80,7 @@ export default function LoginPage(): JSX.Element {
               placeholder="Password"
             />
             <button className="btn w-full" disabled={loading}>
-              {loading ? "Signing in…" : "Sign In"}
+              {loading ? "Signing in… Please give the backend time to spin up (30-50s)" : "Sign In"}
             </button>
           </form>
         ) : (
