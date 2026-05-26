@@ -11,8 +11,9 @@ const userRoutes = require("./routes/users");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigin = process.env.FRONTEND_URL?.replace(/\/$/, "");
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "*",
+  origin: allowedOrigin || "*",
 }));
 app.use(express.json());
 
