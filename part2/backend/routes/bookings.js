@@ -146,6 +146,9 @@ router.patch("/:id/assign", requireAuth, requireAdmin, async (req, res) => {
           driver_name: driver.name,
           driver_phone: driver.phone,
           driver_username: driver.username,
+          driver_lat: driver.lat,
+          driver_lng: driver.lng,
+          driver_location_label: driver.location_label,
         },
       }
     );

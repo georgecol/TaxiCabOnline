@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -5,6 +6,7 @@ import {
   Popup,
   Polyline,
   useMapEvents,
+  useMap,
 } from "react-leaflet";
 import L from "leaflet";
 import type { LatLngExpression } from "leaflet";
@@ -12,7 +14,11 @@ import type { LatLngExpression } from "leaflet";
 type BookingMapProps = {
   pickupPosition: [number, number] | null;
   destPosition: [number, number] | null;
-  onSelectDest: (lat: number, lng: number, address: string) => void;
+  onSelectDest?: (lat: number, lng: number, address: string) => void;
+  driverPosition?: [number, number] | null;
+  driverLabel?: string;
+  readOnly?: boolean;
+  autoFit?: boolean;
 };
 
 const center: LatLngExpression = [-36.8485, 174.7633];
@@ -32,6 +38,7 @@ function makePin(color: string) {
 
 const pickupIcon = makePin("#22c55e");
 const destIcon = makePin("#ef4444");
+const driverIcon = makePin("#3b82f6");
 
 async function reverseGeocode(lat: number, lng: number): Promise<string> {
   try {
@@ -62,7 +69,35 @@ function LocationPicker({
   return null;
 }
 
-export default function BookingMap({ pickupPosition, destPosition, onSelectDest }: BookingMapProps) {
+function FitBounds({ positions }: { positions: [number, number][] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (positions.length === 0) return;
+    if (positions.length === 1) {
+      map.setView(positions[0], 14);
+    } else {
+      map.fitBounds(L.latLngBounds(positions), { padding: [50, 50] });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+}
+
+export default function BookingMap({
+  pickupPosition,
+  destPosition,
+  onSelectDest,
+  driverPosition,
+  driverLabel,
+  readOnly = false,
+  autoFit = false,
+}: BookingMapProps) {
+  const allPositions: [number, number][] = [
+    pickupPosition,
+    destPosition,
+    driverPosition,
+  ].filter((p): p is [number, number] => p != null);
+
   return (
     <MapContainer
       center={center}
@@ -75,7 +110,8 @@ export default function BookingMap({ pickupPosition, destPosition, onSelectDest 
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <LocationPicker onSelectDest={onSelectDest} />
+      {!readOnly && onSelectDest && <LocationPicker onSelectDest={onSelectDest} />}
+      {autoFit && allPositions.length > 0 && <FitBounds positions={allPositions} />}
 
       {pickupPosition && destPosition && (
         <Polyline
@@ -96,6 +132,12 @@ export default function BookingMap({ pickupPosition, destPosition, onSelectDest 
       {destPosition && (
         <Marker position={destPosition} icon={destIcon}>
           <Popup>Destination</Popup>
+        </Marker>
+      )}
+
+      {driverPosition && (
+        <Marker position={driverPosition} icon={driverIcon}>
+          <Popup>{driverLabel ?? "Driver"}</Popup>
         </Marker>
       )}
     </MapContainer>

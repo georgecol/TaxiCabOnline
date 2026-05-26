@@ -16,6 +16,9 @@ export interface Booking {
   driver_name?: string;
   driver_phone?: string;
   driver_username?: string;
+  driver_lat?: number;
+  driver_lng?: number;
+  driver_location_label?: string;
 }
 
 export interface Driver {
