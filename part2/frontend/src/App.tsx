@@ -1,4 +1,5 @@
 import { useState, type ReactElement } from "react";
+import type { Booking } from "./types/booking";
 import { useAuth } from "./context/AuthContext";
 import BookingPage from "./pages/BookingPage";
 import AdminPage from "./pages/AdminPage";
@@ -17,6 +18,12 @@ function defaultPage(role: string): Page {
 export default function App(): ReactElement {
   const { user, logout } = useAuth();
   const [page, setPage] = useState<Page>(() => defaultPage(user?.role ?? ""));
+  const [editBooking, setEditBooking] = useState<Booking | null>(null);
+
+  function handleEditBooking(b: Booking) {
+    setEditBooking(b);
+    setPage("booking");
+  }
 
   if (!user) return <LoginPage />;
 
@@ -53,9 +60,15 @@ export default function App(): ReactElement {
         </div>
       </div>
 
-      {page === "booking" && <BookingPage />}
+      {page === "booking" && (
+        <BookingPage
+          key={editBooking?._id ?? "new"}
+          onViewBookings={() => { setEditBooking(null); setPage("mybookings"); }}
+          initialEditBooking={editBooking}
+        />
+      )}
       {page === "admin" && <AdminPage />}
-      {page === "mybookings" && <MyBookingsPage />}
+      {page === "mybookings" && <MyBookingsPage onEditBooking={handleEditBooking} />}
       {page === "assignments" && <DriverBookingsPage />}
       {page === "profile" && <ProfilePage />}
     </div>

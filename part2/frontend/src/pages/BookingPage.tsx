@@ -7,20 +7,35 @@ import type { JSX } from "react";
 import type { Booking } from "../types/booking";
 import { useAuth } from "../context/AuthContext";
 
-export default function BookingPage(): JSX.Element {
+type Props = {
+  onViewBookings?: () => void;
+  initialEditBooking?: Booking | null;
+};
+
+export default function BookingPage({ onViewBookings, initialEditBooking }: Props): JSX.Element {
   const { user } = useAuth();
   const [message, setMessage] = useState<string>("");
   const [booking, setBooking] = useState<Booking | null>(null);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [formKey, setFormKey] = useState(0);
-  const [editingBookingId, setEditingBookingId] = useState<string | null>(null);
+  const [editingBookingId, setEditingBookingId] = useState<string | null>(
+    initialEditBooking?._id ?? null
+  );
 
-  const [pickupAddress, setPickupAddress] = useState("");
-  const [pickupPosition, setPickupPosition] = useState<[number, number] | null>(null);
+  const [pickupAddress, setPickupAddress] = useState(initialEditBooking?.pickup_address ?? "");
+  const [pickupPosition, setPickupPosition] = useState<[number, number] | null>(
+    initialEditBooking?.pickup_lat != null && initialEditBooking?.pickup_lng != null
+      ? [initialEditBooking.pickup_lat, initialEditBooking.pickup_lng]
+      : null
+  );
 
-  const [destAddress, setDestAddress] = useState("");
-  const [destPosition, setDestPosition] = useState<[number, number] | null>(null);
+  const [destAddress, setDestAddress] = useState(initialEditBooking?.dest_address ?? "");
+  const [destPosition, setDestPosition] = useState<[number, number] | null>(
+    initialEditBooking?.dest_lat != null && initialEditBooking?.dest_lng != null
+      ? [initialEditBooking.dest_lat, initialEditBooking.dest_lng]
+      : null
+  );
 
   function handlePickupAddressChange(addr: string, lat?: number, lng?: number) {
     setPickupAddress(addr);
@@ -103,8 +118,10 @@ export default function BookingPage(): JSX.Element {
             pickupPosition={pickupPosition}
             destPosition={destPosition}
             onSelectDest={handleMapDest}
-            defaultName={user?.name}
-            defaultPhone={user?.phone}
+            defaultName={initialEditBooking?.cname ?? user?.name}
+            defaultPhone={initialEditBooking?.phone ?? user?.phone}
+            defaultPickupDate={initialEditBooking?.pickup_date}
+            defaultPickupTime={initialEditBooking?.pickup_time?.slice(0, 5)}
             mode={editingBookingId ? "edit" : "create"}
           />
           {loading && <div className="mt-2 text-sm text-gray-600">Submitting…</div>}
@@ -112,19 +129,29 @@ export default function BookingPage(): JSX.Element {
       ) : (
         <>
           <ReferenceMessage message={message} booking={booking} />
-          <div className="mt-4 flex gap-3">
-            <button
-              onClick={handleEdit}
-              className="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors"
-            >
-              Edit Booking
-            </button>
-            <button
-              onClick={handleNew}
-              className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold shadow transition-colors"
-            >
-              New Booking
-            </button>
+          <div className="mt-4 flex flex-col gap-2">
+            {onViewBookings && (
+              <button
+                onClick={onViewBookings}
+                className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold shadow transition-colors"
+              >
+                View My Bookings
+              </button>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={handleEdit}
+                className="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors"
+              >
+                Edit Booking
+              </button>
+              <button
+                onClick={handleNew}
+                className="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors"
+              >
+                New Booking
+              </button>
+            </div>
           </div>
         </>
       )}

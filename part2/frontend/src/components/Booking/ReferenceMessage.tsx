@@ -18,6 +18,14 @@ function formatTime(time: string): string {
   return d.toLocaleTimeString("en-NZ", { hour: "numeric", minute: "2-digit", hour12: true });
 }
 
+function formatPlaced(iso?: string): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("en-NZ", {
+    day: "numeric", month: "short", year: "numeric",
+    hour: "numeric", minute: "2-digit", hour12: true,
+  });
+}
+
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <>
@@ -61,8 +69,9 @@ export default function ReferenceMessage({ message, booking }: Props): JSX.Eleme
           <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
             <Row label="Name" value={booking.cname} />
             <Row label="Phone" value={booking.phone} />
-            <Row label="Date" value={formatDate(booking.pickup_date)} />
-            <Row label="Time" value={formatTime(booking.pickup_time)} />
+            <Row label="Pickup Date" value={formatDate(booking.pickup_date)} />
+            <Row label="Pickup Time" value={formatTime(booking.pickup_time)} />
+            <Row label="Booking Placed" value={formatPlaced(booking.created_at)} />
             {booking.pickup_address && <Row label="Pickup" value={booking.pickup_address} />}
             {booking.dest_address && <Row label="Destination" value={booking.dest_address} />}
           </dl>

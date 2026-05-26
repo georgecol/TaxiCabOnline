@@ -11,6 +11,7 @@ export interface Booking {
   dest_lng?: number;
   pickup_date: string;  // YYYY-MM-DD
   pickup_time: string;  // HH:MM:SS
+  created_at?: string;
   status: "unassigned" | "assigned";
   username?: string;
   driver_name?: string;

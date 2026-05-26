@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMyBookings } from "../api/bookingAPI";
+import { getMyBookings, cancelBooking } from "../api/bookingAPI";
 import type { Booking } from "../types/booking";
 import type { JSX } from "react";
 import BookingDetailModal from "../components/Booking/BookingDetailModal";
@@ -75,9 +75,16 @@ function BookingCard({
           </button>
         </div>
       </div>
-      <p className="text-gray-500">
-        {formatDate(booking.pickup_date)} at {formatTime(booking.pickup_time)}
+      <p className="text-gray-700 text-xs font-medium">
+        Pickup: {formatDate(booking.pickup_date)} at {formatTime(booking.pickup_time)}
       </p>
+      {booking.created_at && (
+        <p className="text-gray-400 text-xs">
+          Placed: {new Date(booking.created_at).toLocaleString("en-NZ", {
+            day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true,
+          })}
+        </p>
+      )}
       {booking.pickup_address && (
         <p className="text-gray-700">
           <span className="font-medium">From:</span> {booking.pickup_address}
@@ -122,13 +129,13 @@ function Section({
   );
 }
 
-export default function MyBookingsPage(): JSX.Element {
+export default function MyBookingsPage({ onEditBooking }: { onEditBooking?: (b: Booking) => void }): JSX.Element {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [viewingBooking, setViewingBooking] = useState<Booking | null>(null);
 
-  useEffect(() => {
+  function loadBookings() {
     getMyBookings().then((res) => {
       if (res.success) {
         setBookings(res.data ?? []);
@@ -137,7 +144,15 @@ export default function MyBookingsPage(): JSX.Element {
       }
       setLoading(false);
     });
-  }, []);
+  }
+
+  useEffect(() => { loadBookings(); }, []);
+
+  async function handleCancel(b: Booking) {
+    await cancelBooking(b._id);
+    setViewingBooking(null);
+    loadBookings();
+  }
 
   const now = new Date();
 
@@ -183,6 +198,8 @@ export default function MyBookingsPage(): JSX.Element {
         <BookingDetailModal
           booking={viewingBooking}
           onClose={() => setViewingBooking(null)}
+          onEdit={onEditBooking}
+          onCancel={handleCancel}
         />
       )}
     </div>

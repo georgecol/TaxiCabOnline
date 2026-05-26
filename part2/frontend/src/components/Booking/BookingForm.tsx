@@ -16,6 +16,8 @@ type Props = {
   onSelectDest: (lat: number, lng: number, address: string) => void;
   defaultName?: string;
   defaultPhone?: string;
+  defaultPickupDate?: string;
+  defaultPickupTime?: string;
   mode?: "create" | "edit";
 };
 
@@ -179,11 +181,18 @@ export default function BookingForm({
   onSelectDest,
   defaultName = "",
   defaultPhone = "",
+  defaultPickupDate,
+  defaultPickupTime,
   mode = "create",
 }: Props): JSX.Element {
   const [values, setValues] = useState(() => {
     const { date, time } = getNowDateTime();
-    return { cname: defaultName, phone: defaultPhone, pickup_date: date, pickup_time: time };
+    return {
+      cname: defaultName,
+      phone: defaultPhone,
+      pickup_date: defaultPickupDate ?? date,
+      pickup_time: defaultPickupTime ?? time,
+    };
   });
   const [advanced, setAdvanced] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof BookingFormValues, string>>>({});

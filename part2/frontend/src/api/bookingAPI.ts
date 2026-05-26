@@ -49,6 +49,15 @@ export async function getDriverAssignments(): Promise<{ success: boolean; data?:
   return res.json().catch(() => ({ success: false }));
 }
 
+export async function cancelBooking(id: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${BASE_URL}/bookings/${id}`, {
+    method: "DELETE",
+    headers: authHeader(),
+  });
+  const json = await res.json().catch(() => ({ success: false, message: "Invalid JSON response" }));
+  return json;
+}
+
 export async function updateBooking(
   id: string,
   values: BookingFormValues

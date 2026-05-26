@@ -46,9 +46,16 @@ function AssignmentCard({ booking, onView }: { booking: Booking; onView: (b: Boo
         </div>
       </div>
 
-      <p className="text-gray-500">
-        {formatDate(booking.pickup_date)} at {formatTime(booking.pickup_time)}
+      <p className="text-gray-700 text-xs font-medium">
+        Pickup: {formatDate(booking.pickup_date)} at {formatTime(booking.pickup_time)}
       </p>
+      {booking.created_at && (
+        <p className="text-gray-400 text-xs">
+          Placed: {new Date(booking.created_at).toLocaleString("en-NZ", {
+            day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true,
+          })}
+        </p>
+      )}
 
       {booking.pickup_address && (
         <p className="text-gray-700">

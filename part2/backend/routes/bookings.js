@@ -151,6 +151,16 @@ router.patch("/:id/assign", requireAuth, requireAdmin, async (req, res) => {
 
     if (!driver) return res.status(404).json({ success: false, message: "Driver not found" });
 
+    const booking = await getDB().collection("bookings").findOne({ _id: new ObjectId(id) });
+    if (!booking) return res.status(404).json({ success: false, message: "Booking not found" });
+
+    if (booking.pickup_date && booking.pickup_time) {
+      const pickupDateTime = new Date(`${booking.pickup_date}T${booking.pickup_time}`);
+      if (pickupDateTime <= new Date()) {
+        return res.status(409).json({ success: false, message: "Cannot assign a driver to a past booking" });
+      }
+    }
+
     const result = await getDB().collection("bookings").updateOne(
       { _id: new ObjectId(id) },
       {
@@ -172,6 +182,30 @@ router.patch("/:id/assign", requireAuth, requireAdmin, async (req, res) => {
     }
 
     res.json({ success: true, message: `Assigned to ${driver.name}` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// CANCEL BOOKING (owner only, unassigned only)
+router.delete("/:id", requireAuth, async (req, res) => {
+  try {
+    const collection = getDB().collection("bookings");
+    const { id } = req.params;
+
+    let existing;
+    try {
+      existing = await collection.findOne({ _id: new ObjectId(id) });
+    } catch {
+      return res.status(400).json({ success: false, message: "Invalid booking ID" });
+    }
+
+    if (!existing) return res.status(404).json({ success: false, message: "Booking not found" });
+    if (existing.username !== req.user.username) return res.status(403).json({ success: false, message: "Not your booking" });
+    if (existing.status === "assigned") return res.status(409).json({ success: false, message: "Cannot cancel an assigned booking" });
+
+    await collection.deleteOne({ _id: new ObjectId(id) });
+    res.json({ success: true, message: "Booking cancelled" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
