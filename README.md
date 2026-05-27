@@ -1,15 +1,18 @@
-================================================================================                 
-### TAXICAB ONLINE — PROJECT DOCUMENTATION
-================================================================================
+# TAXICAB ONLINE — PROJECT DOCUMENTATION
 
 Student:        George Collier
 Course:         Web Development
 Date:           26 May 2026
-Active Codebase: part2/
 
-================================================================================
-### 1. PUBLIC URL OF THE DEPLOYED APPLICATION
-================================================================================
+# Part 1
+
+
+
+
+
+# Part 2
+
+## 1. PUBLIC URL OF THE DEPLOYED APPLICATION
 
 Frontend (Vercel):
   https://web-dev-chi-coral.vercel.app
@@ -25,9 +28,9 @@ application to function.
 Note: The Render free tier may spin down after inactivity. If the first
 request is slow (up to 30 seconds), allow the backend to wake before retrying.
 
-================================================================================
-### 2. TECHNOLOGY STACK USED
-================================================================================
+
+## 2. TECHNOLOGY STACK USED
+
 
 FRONTEND
 --------
@@ -72,9 +75,9 @@ BACKEND
     - dotenv 17.x            Loads environment variables from .env file
     - nodemon                Hot-reload dev utility (dev only)
 
-================================================================================
+
 ### 3. HOW TO RUN AND BUILD THE PROJECT LOCALLY
-================================================================================
+
 
 PREREQUISITES
 -------------
