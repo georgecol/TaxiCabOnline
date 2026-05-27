@@ -1,6 +1,7 @@
-<!-- George Collier -->
-<!-- 23221769 -->
 <?php
+// George Collier
+// 23221769
+
 // server side code to get input from client  session, then log it in the database
 header('Content-Type: application/json'); // set header to json, can now only echo json to the front end, no HTML 
 

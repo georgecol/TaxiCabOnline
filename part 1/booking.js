@@ -1,8 +1,8 @@
 //George Collier
 //23221769
+
 // Restraints: not null,certain fields must be numeric so on so forth.
 // certain fields
-
 // client side script to send request to server , using JS async fetch method to place a booking
 
 //get form
@@ -23,6 +23,7 @@ form.addEventListener('submit', (e) => { //
     //validate
     let test = validateData(formData)
     if (test) {
+        console.log("invoking sendBooking()");
         sendBooking(formData, httpAction); // json form data + POST
     }
     // test fail, end of submit flow
@@ -31,6 +32,7 @@ form.addEventListener('submit', (e) => { //
 function validateData(formData) {
     const pattern = /^\d{10,12}$/;
     if (!formData) {
+        console.log("formData object empty")
         return false;
     }
     //more validation needed  
@@ -54,6 +56,7 @@ function validateData(formData) {
 
 
 function sendBooking(formData, action) {
+    console.log("sendBooking()");
     var url = "booking.php?action=" + action;
     // step 3
     // send to backend
@@ -67,6 +70,7 @@ function sendBooking(formData, action) {
             // return res.text(); // raw text for debugging if server sent error to us
         })
         .then(res => {
+            // console.log("raw response");
             // console.log(res);
             try {
                 document.getElementById("reference").innerText = res.message; // display string directly to screen, put in the reference div
@@ -77,7 +81,7 @@ function sendBooking(formData, action) {
         })
         .catch(err => {
             console.log("Caught error from server");
-            console.error("Error");
+            console.error(err);
             
         })
 
