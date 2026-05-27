@@ -7,8 +7,10 @@ following fields:
 - street name , stname 
 - Suburb, sbname varchar not null , varchar(100)
 - Dest suburb, optional, same type as suburb
-- pick up DATETIME- both in one, validate server side that the pick up time is not earlier 
-  than current time
+- pick up date, DATE
+- pick up time, TIME
+- booking datetime 
+- status enum
 
 new 
 
