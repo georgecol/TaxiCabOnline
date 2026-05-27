@@ -1,9 +1,6 @@
-// load bookings within 2 hours of the time on page load
-document.addEventListener("DOMContentLoaded", function () {
-    // loadDefaultBookings(); - load default ones immediately.
-    console.log("DOM is ready!");
+// George Collier
+// 23221769
 
-});
 // handle enter button as a form of submit
 document.getElementById("searchForm").addEventListener("submit", function (e) {
     e.preventDefault();
@@ -62,8 +59,10 @@ function searchBookings(ref, refreshAssign) {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "action=search&bsearch=" + encodeURIComponent(ref)
     })
-        .then(res => res.json())
+        // .then(res => res.json())
+        .then(res => res.text())
         .then(data => {
+            console.log(data)
             if (refreshAssign) clearAssignBox();
             if (data.success) {
                 console.log(data);

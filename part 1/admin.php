@@ -1,10 +1,11 @@
 <?php
+// George Collier 
+// 23221769 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json'); // set response header to json
 
-session_start(); // CAN DELETE? - doesnt do anything 
 
 // DB config
 require_once("../../files/sqlinfoassignment.inc.php");
@@ -29,15 +30,6 @@ if ($action === "search") {
 
     // CASE 1: reference search
     if (!empty($input)) {
-
-        // if (!preg_match("/^BRN[0-9]{5}$/", $input)) {
-        //     echo json_encode([
-        //         "success" => true,
-        //         "data" => []
-        //     ]);
-        //     exit;
-        // }
-
         $stmt = $connection->prepare("SELECT * FROM bookings WHERE booking_ref = ?");
         $stmt->bind_param("s", $input);
         $message = "Searching for booking with ref: ". $input;

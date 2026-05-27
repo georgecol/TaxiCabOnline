@@ -1,4 +1,5 @@
-
+//George Collier
+//23221769
 // Restraints: not null,certain fields must be numeric so on so forth.
 // certain fields
 
@@ -62,23 +63,23 @@ function sendBooking(formData, action) {
 
     })
         .then(res => {
-            return res.json(); // extract response
-            // return res.text() // raw text for debugging if server sent error to us
+            return res.json();  // extract response, only works if server sending good json
+            // return res.text(); // raw text for debugging if server sent error to us
         })
         .then(res => {
-            // console.log("Raw response:", text);
-            // console.log("Second stage after res.json()");
             // console.log(res);
             try {
-                // const data = JSON.parse(res.message); // attempt to convert the booking confirmation message from string to json object
-
                 document.getElementById("reference").innerText = res.message; // display string directly to screen, put in the reference div
             } catch (e) {
                 console.error("Error parsing response");
             }
 
         })
-        .catch(err => console.error("Error"))
+        .catch(err => {
+            console.log("Caught error from server");
+            console.error("Error");
+            
+        })
 
 }
 
