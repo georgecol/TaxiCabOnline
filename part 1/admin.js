@@ -38,7 +38,6 @@ function loadDefaultBookings() {
     })
         .then(res => res.json()) // parse to json object 
         .then(data => {
-            clearAssignBox();
             if (data.success) { // if success message from database = true
                 console.log(data);
                 renderTable(data.data);
