@@ -13,7 +13,7 @@ document.getElementById("date").value = `${year}-${month}-${day}`; // set the da
 
 // build time string in HH:MM format` (required by time input)`
 const hours = String(now.getHours()).padStart(2, "0"); // padStart ensures 2 digits e.g. 08 not 8
-const minutes = String(now.getMinutes()).padStart(2, "0");
+const minutes = String(now.getMinutes()+ 1).padStart(2, "0"); // add one to the minutes so its not in the past
 document.getElementById("time").value = `${hours}:${minutes}`; // set the time input value
 
 //get form
