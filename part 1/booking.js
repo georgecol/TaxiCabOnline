@@ -1,25 +1,30 @@
 //George Collier
 //23221769
-// Restraints: not null,certain fields must be numeric so on so forth.
-// certain fields
 
-// client side script to send request to server , using JS async fetch method to place a booking
+// auto-fill date and time on load
+const now = new Date(); // get the current date and time
+
+// build date string in YYYY-MM-DD format (required by date input)
+// using local time methods so the date matches the user's timezone
+const year = now.getFullYear();
+const month = String(now.getMonth() + 1).padStart(2, "0"); // getMonth() is 0-indexed so add 1, padStart ensures 2 digits e.g. 05 not 5
+const day = String(now.getDate()).padStart(2, "0"); // padStart ensures 2 digits e.g. 09 not 9
+document.getElementById("date").value = `${year}-${month}-${day}`; // set the date input value
+
+// build time string in HH:MM format` (required by time input)`
+const hours = String(now.getHours()).padStart(2, "0"); // padStart ensures 2 digits e.g. 08 not 8
+const minutes = String(now.getMinutes()+ 1).padStart(2, "0"); // add one to the minutes so its not in the past
+document.getElementById("time").value = `${hours}:${minutes}`; // set the time input value
 
 //get form
 const form = document.getElementById("bookingForm");
 const httpAction = "POST";
 //Step 1 , receive input
-
+// Event listener to validate data 
 form.addEventListener('submit', (e) => { // 
     e.preventDefault(); // prevents submission of a blank form, case sensitive event.preventDefault() not event.PreventDefault()
-    console.log("submit triggered"); // testing 
     //get form data object
     formData = new FormData(e.target);
-    //debug
-    for (let [key, value] of formData.entries()) { // debug print
-        console.log(`${key}: ${value}`);
-
-    }
     //validate
     let test = validateData(formData)
     if (test) {
@@ -30,16 +35,17 @@ form.addEventListener('submit', (e) => { //
 //step 2, validate input
 function validateData(formData) {
     const pattern = /^\d{10,12}$/;
-    if (!formData) {
-        return false;
-    }
-    //more validation needed  
-    const phone = formData.get("phone");
+
+    // Get phone value from formdata
+    let phone = formData.get("phone")
+    phone = phone.replace(/\s+/g, ''); // remove whitespaces
+
+    // Make sure that the phone input is ;between 10-12 digits    
     if (!pattern.test(phone)) {
         alert("Phone number must be numeric and 10-12 digits"); //html popout alert box
         return false;
     }
-    // check datetime not in past
+    // check Date not in past
     const inputDateTime = new Date(
         formData.get("date") + "T" + formData.get("time")
     );
@@ -52,7 +58,8 @@ function validateData(formData) {
     return true;
 }
 
-
+// Final step, after validation, send the booking to backend, wait for response from php server
+// and the display the confirmation message that the server responds with below the booking form.
 function sendBooking(formData, action) {
     var url = "booking.php?action=" + action;
     // step 3
@@ -60,27 +67,19 @@ function sendBooking(formData, action) {
     fetch(url, {
         method: action,
         body: formData // send form data object, server side stored in _POST array with the form names as the variable names
-
     })
         .then(res => {
-            return res.json(); // extract response
-            // return res.text() // raw text for debugging if server sent error to us
+            return res.json();  // extract response, only works if server sending good json
         })
         .then(res => {
-            // console.log("Raw response:", text);
-            // console.log("Second stage after res.json()");
-            // console.log(res);
             try {
-                // const data = JSON.parse(res.message); // attempt to convert the booking confirmation message from string to json object
-
                 document.getElementById("reference").innerText = res.message; // display string directly to screen, put in the reference div
             } catch (e) {
                 console.error("Error parsing response");
             }
-
         })
-        .catch(err => console.error("Error"))
-
+        .catch(err => {
+            console.error(err);
+        })
 }
-
 

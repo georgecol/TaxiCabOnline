@@ -7,6 +7,9 @@ document.getElementById("searchForm").addEventListener("submit", function (e) {
     queryBookings();
 });
 
+// Function called by event listener to handle the two cases for querying the backend.
+// Case 1 = empty input - call load default bookings function
+// case 2 = input - call validation function, if fail, alert user, if pass, then search bookings with the ref if passed.
 function queryBookings(refreshAssign = true) { // if refresh assign not passed, give true as default 
     const ref = document.getElementById("bsearch").value.trim() // remove whitespace from string e.g. "BRN0001  " -> "BRN0001";
     // case 1, query with no params
@@ -26,21 +29,21 @@ function queryBookings(refreshAssign = true) { // if refresh assign not passed, 
     }
 }
 
-
-
+// // Function called when user selects the submit button on admin page.
+// whenever the input box is empty
 function loadDefaultBookings() {
     //case 1, search bar empty
     // http request to admin server
     fetch("admin.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=search&bsearch=" // send action search with empty value 
+        body: new URLSearchParams({ // cleaner way of doing it, instead of encodeURIComponent(id)
+            action: "search", // search with empty parameter
+        })
     })
         .then(res => res.json()) // parse to json object 
         .then(data => {
-            clearAssignBox();
             if (data.success) { // if success message from database = true
-                console.log(data);
                 renderTable(data.data);
                 document.getElementById("message").innerHTML = data.message; // display message from server 
             }
@@ -51,29 +54,33 @@ function loadDefaultBookings() {
 }
 
 
-
+// Function called when user selects the submit button on admin page.
+// Queries the backend with the search parameter in the input box, which is  string value for booking reference
 function searchBookings(ref, refreshAssign) {
     // case 2, ref not empty, load booking value
     fetch("admin.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=search&bsearch=" + encodeURIComponent(ref)
+        body: new URLSearchParams({ // cleaner way of doing it, instead of encodeURIComponent(id)
+            action: "search",
+            bsearch: ref 
+        })
     })
         .then(res => res.json())
-        .then(data => {
+        .then(res => {
             if (refreshAssign) clearAssignBox();
-            if (data.success) {
-                console.log(data);
-                renderTable(data.data);
-                document.getElementById("message").innerHTML = data.message; // display message from server 
+            // backend send json "succes":true, or "success":false, 
+            if (res.success) {
+                renderTable(res.data); // 
+                document.getElementById("message").innerHTML = res.message; // display message from server 
             } else {
-                document.getElementById("message").innerHTML = "Error: " + data.error;
+                document.getElementById("message").innerHTML = "Error: " + res.error;
             }
         });
 }
 
 
-// send table to html page
+// Render result of query on html page.
 function renderTable(data) {
     if (!data || data.length === 0) {
         document.querySelector(".content").innerHTML = "<p>No bookings found.</p>";

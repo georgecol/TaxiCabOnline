@@ -1,15 +1,18 @@
-================================================================================
-                     TAXICAB ONLINE — PROJECT DOCUMENTATION
-================================================================================
+# TAXICAB ONLINE — PROJECT DOCUMENTATION
 
 Student:        George Collier
 Course:         Web Development
 Date:           26 May 2026
-Active Codebase: part2/
 
-================================================================================
-1. PUBLIC URL OF THE DEPLOYED APPLICATION
-================================================================================
+# Part 1
+
+
+
+
+
+# Part 2
+
+## 1. PUBLIC URL OF THE DEPLOYED APPLICATION
 
 Frontend (Vercel):
   https://web-dev-chi-coral.vercel.app
@@ -25,9 +28,9 @@ application to function.
 Note: The Render free tier may spin down after inactivity. If the first
 request is slow (up to 30 seconds), allow the backend to wake before retrying.
 
-================================================================================
-2. TECHNOLOGY STACK USED
-================================================================================
+
+## 2. TECHNOLOGY STACK USED
+
 
 FRONTEND
 --------
@@ -72,9 +75,9 @@ BACKEND
     - dotenv 17.x            Loads environment variables from .env file
     - nodemon                Hot-reload dev utility (dev only)
 
-================================================================================
-3. HOW TO RUN AND BUILD THE PROJECT LOCALLY
-================================================================================
+
+### 3. HOW TO RUN AND BUILD THE PROJECT LOCALLY
+
 
 PREREQUISITES
 -------------
@@ -145,9 +148,9 @@ STEP 6: Build the frontend for production
     cd part2/backend
     npm start
 
-================================================================================
-4. MICROSERVICE API ENDPOINTS
-================================================================================
+
+### 4. MICROSERVICE API ENDPOINTS
+
 
 Base URL (local):   http://localhost:5000/api
 Base URL (remote):  https://webdev-backend-latest.onrender.com/api
@@ -247,9 +250,9 @@ USERS  (/api/users)
     Notes:   Returns all users, sorted by creation date descending.
              Password fields are excluded.
 
-================================================================================
-5. FEATURE DESCRIPTIONS
-================================================================================
+
+### 5. FEATURE DESCRIPTIONS
+
 
 5.1  AUTHENTICATION SYSTEM
 --------------------------
@@ -285,7 +288,7 @@ can edit the booking, make another booking, or navigate to My Bookings.
 5.3  MAP INTEGRATION
 ---------------------
 An interactive Leaflet map is embedded in the booking form. It is centred on
-Auckland, New Zealand, at zoom level 13. Users can click anywhere on the map
+Auckland, New Zealand. Users can click anywhere on the map
 to set the destination; Nominatim reverse geocoding converts the clicked
 coordinates into a human-readable address that populates the destination field.
 
@@ -343,7 +346,7 @@ is persisted in localStorage via a custom useDarkMode hook so it survives
 page refreshes.
 
 ================================================================================
-6. TESTING INSTRUCTIONS
+### 6. TESTING INSTRUCTIONS
 ================================================================================
 
 6.1  ACCESSING THE APPLICATION
@@ -438,16 +441,16 @@ Example (values will differ in your database):
     passed → error "Cannot assign a driver to a past booking".
 
 ================================================================================
-7. LIMITATIONS AND KNOWN ISSUES
+### 7. LIMITATIONS AND KNOWN ISSUES
 ================================================================================
 
-  1. No real-time updates
+  8. No real-time updates
      The admin dashboard and My Bookings page do not poll for changes
      automatically. If a booking is assigned in one browser session, other
      open sessions will not reflect the change until they manually refresh or
      navigate away and back.
 
-  2. Geocoding reliability
+  9. Geocoding reliability
      Forward geocoding (address text to coordinates) is handled by the free
      Nominatim service operated by OpenStreetMap. Nominatim's results are
      NZ-biased (countrycodes=nz), but uncommon or ambiguous addresses may fail
@@ -455,41 +458,41 @@ Example (values will differ in your database):
      coordinates are stored as undefined, which means the map will not display
      pins for that address on subsequent views.
 
-  3. Nominatim rate limiting
+  10. Nominatim rate limiting
      Nominatim imposes a usage policy of no more than one request per second.
      Rapid sequential geocode requests (e.g., automated testing scripts) may
      be throttled or blocked temporarily.
 
-  4. Backend cold-start on Render free tier
+  11. Backend cold-start on Render free tier
      The backend is hosted on Render's free tier, which spins down idle
      instances after 15 minutes of inactivity. The first API call after a
      period of inactivity can take up to 30 seconds as the service restarts.
      This is a hosting constraint, not an application bug.
 
-  5. No booking time-window enforcement at creation
+  12. No booking time-window enforcement at creation
      The application enforces that a pickup time must be in the future but
      does not enforce a minimum advance notice period (e.g., at least 30
      minutes from now). A booking could theoretically be placed 1 minute
      before the requested pickup time.
 
-  6. Admin-only driver creation
+  13. Admin-only driver creation
      New driver accounts cannot self-register; they must be inserted into the
      database manually (e.g., via MongoDB Atlas or a seed script). Only the
      "testuser" role is granted on self-registration.
 
-  7. Sequential booking reference counter
+  14. Sequential booking reference counter
      The counter document must be pre-initialised in the MongoDB "counters"
      collection (with _id: "booking_ref" and seq: 0). If this document is
      missing, booking creation will throw a "Counter not initialized properly"
      error.
 
-  8. No pagination
+  15. No pagination
      The admin All Bookings endpoints return every matching document in a
      single response. For large datasets, this could become slow or exceed
      memory limits. Pagination has not been implemented.
 
 ================================================================================
-8. REFLECTION ON AI-SUPPORTED DEVELOPMENT PROCESS
+### 8. REFLECTION ON AI-SUPPORTED DEVELOPMENT PROCESS
 ================================================================================
 
 This project was developed with the assistance of Claude Code (Anthropic's AI
@@ -558,6 +561,3 @@ diagnosing specific errors, but requiring ongoing judgement and direction from
 the developer. The end result is code I understand and can maintain, not code
 I accepted blindly.
 
-================================================================================
-END OF DOCUMENT
-================================================================================
