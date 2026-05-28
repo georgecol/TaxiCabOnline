@@ -148,9 +148,9 @@ STEP 6: Build the frontend for production
     cd part2/backend
     npm start
 
-================================================================================
+
 ### 4. MICROSERVICE API ENDPOINTS
-================================================================================
+
 
 Base URL (local):   http://localhost:5000/api
 Base URL (remote):  https://webdev-backend-latest.onrender.com/api
@@ -250,9 +250,9 @@ USERS  (/api/users)
     Notes:   Returns all users, sorted by creation date descending.
              Password fields are excluded.
 
-================================================================================
+
 ### 5. FEATURE DESCRIPTIONS
-================================================================================
+
 
 5.1  AUTHENTICATION SYSTEM
 --------------------------

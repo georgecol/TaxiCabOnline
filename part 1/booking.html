@@ -1,5 +1,5 @@
 <!-- George Collier -->
- <!-- 23221769 -->
+<!-- 23221769 -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,23 +12,24 @@
 </head>
 
 <body>
+
     <h2> Book a Taxi. <br> Enter your details below:</h2>
     <p><a href="admin.html">Admin Panel</a><br></p>
     <form id="bookingForm">
         <p><label>Name:</label>
-            <input type="text" name="cname" required></input> 
+            <input type="text" name="cname" required></input>
         </p>
         <p><label>Phone number:</label>
-            <input type="tel" placeholder="123 456 7890" name="phone" required></input> 
+            <input type="tel" placeholder="123 456 7890" name="phone" required></input>
         </p>
         <p><label>Unit Number: </label>
             <input type="text" name="unumber"></input>
         </p>
         <p><label> Street Number: </label>
-            <input type="text" name="snumber" required></input> 
+            <input type="text" name="snumber" required></input>
         </p>
         <p><label> Street Name: </label>
-            <input type="text" name="stname" required></input> 
+            <input type="text" name="stname" required></input>
         </p>
         <p><label> Suburb: </label>
             <input type="text" name="sbname"></input>
@@ -37,15 +38,16 @@
             <input type="text" name="dsbname"></input>
         </p>
         <p><label> Pick Up Date: </label>
-            <input type="date" name="date" required></input> 
+            <input type="date" id="date" name="date" required></input>
         </p>
         <p><label>Pick up time: </label>
-            <input type="time"  name="time" required></input> 
+            <input type="time" id="time" name="time" required></input>
         </p>
         <input type="submit" id="book"></input>
     </form>
     <br>
-        <!-- server response to go in this div -->
+    <!-- server response to go in this div -->
+    <!-- booking reference -->
     <div id="reference">
 
     </div>
