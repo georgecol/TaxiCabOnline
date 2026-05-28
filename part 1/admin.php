@@ -20,7 +20,7 @@ if (!$connection) {
     exit;
 }
 
-// get action safely (search,loadbookings,assign)
+// get action safely (search,assign)
 $action = $_POST['action'] ?? '';
 
 
@@ -112,44 +112,6 @@ if ($action === "assign") {
     $connection->close();
     exit; // exit to not run the rest of the code
 }
-
-if($action === "loadDefault")
-    {
-    // get bookings from last 2 hours
-    // return them
-    $stmt = $connection->prepare("
-        SELECT * FROM bookings 
-        WHERE status = 'unassigned'
-        AND pickup_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 2 HOUR)
-    ");
-    // execute statement without binding params, because we are not passing any arguments to the query string.
-    if (!$stmt->execute()) {
-        // if statement doesnt execute, return JSON object with two key value pairs
-        // success: false, error: statement error
-        // return to frontend
-        echo json_encode([
-            "success" => false,
-            "error" => $stmt->error
-        ]);
-        exit;
-    }
-
-    $result = $stmt->get_result();
-
-    $data = [];
-    // fill array with row results from result set
-    // should be zero or more results in the data associative array
-    while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
-    }
-    // return json object with data
-    echo json_encode([
-        "success" => true,
-        "data" => $data
-    ]);
-    $connection->close();
-    exit; // exit once done so last return doesnt run
-    }
 
 //last catch
 // invalid action, runs if none of the above if statements fire
