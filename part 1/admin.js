@@ -14,7 +14,7 @@ function queryBookings(refreshAssign = true) { // if refresh assign not passed, 
     const ref = document.getElementById("bsearch").value.trim() // remove whitespace from string e.g. "BRN0001  " -> "BRN0001";
     // case 1, query with no params
     if (ref === "") {
-        loadDefaultBookings();
+        loadDefaultBookings(refreshAssign);
         return;
     }
     //case 2
@@ -31,7 +31,7 @@ function queryBookings(refreshAssign = true) { // if refresh assign not passed, 
 
 // // Function called when user selects the submit button on admin page.
 // whenever the input box is empty
-function loadDefaultBookings() {
+function loadDefaultBookings(refreshAssign) {
     //case 1, search bar empty
     // http request to admin server
     fetch("admin.php", {
@@ -43,6 +43,7 @@ function loadDefaultBookings() {
     })
         .then(res => res.json()) // parse to json object 
         .then(data => {
+            if (refreshAssign) clearAssignBox();
             if (data.success) { // if success message from database = true
                 renderTable(data.data);
                 document.getElementById("message").innerHTML = data.message; // display message from server 
