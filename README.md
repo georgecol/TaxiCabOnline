@@ -24,7 +24,7 @@
 | Service | URL |
 |---------|-----|
 | Frontend (Vercel) | https://web-dev-chi-coral.vercel.app |
-| Backend API (Render) | https://webdev-backend-latest.onrender.com |
+| Backend API (Render) | https://webdev-vklm.onrender.com |
 
 The frontend communicates with the backend via the `VITE_API_URL` environment variable, set to the production API base URL at deploy time. Both services must be running simultaneously.
 
